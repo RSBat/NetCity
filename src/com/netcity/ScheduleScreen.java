@@ -43,15 +43,18 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 	
 	//Описание переменных
 	
-	Button btnMarks;
+	//
+	Button btnMarks, btnNews;
 	
 	//Массивы строк
-	String[] days = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};//
+	String[] days = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"}; //Дни недели (Скоро не понадобится)
 	String[][] lessons = new String[6][15]; //Массив с уроками
 	String[][] lessonsNums = new String[6][15]; //Массив с номерами уроков
 	
 	//JSON
 	JSONObject json = new JSONObject(); //JSON для оценок
+	
+	private static long back_pressed; //Для обработки двойного нажатия на кнопку назад
 	
 	//Вызывается при создании активити
 	@Override
@@ -59,9 +62,11 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 		super.onCreate(savedInstanceState); //Вызываем стандартный конструктор
 		setContentView(R.layout.activity_schedule_screen); //Присвайваем layout файл
 		
-		btnMarks = (Button) findViewById(R.id.btn_schedule_marks); //Находим кнопку для перехода на оценки по id
+		btnMarks = (Button) findViewById(R.id.btn_schedule_marks); //Находим кнопку для перехода на оценки
+		btnNews = (Button) findViewById(R.id.btn_schedule_news); //Находим кнопку для перехода на объявления
 		
 		final Intent intMarks = new Intent(this, MarksScreen.class); //Создаем ссылку на активити с оценками
+		final Intent intNews = new Intent(this, NewsScreen.class); //Создаем ссылку на активити с объявлениями
 		
 		OnClickListener onCl = new OnClickListener() { //Создаем обработчик нажатий для кнопки
 
@@ -73,12 +78,16 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 				case R.id.btn_schedule_marks: //Если кнопка перехода на оценки
 					startActivity(intMarks); //Переходим на экран с оценками
 					break;
+				case R.id.btn_schedule_news: //Если кнопка перехода на объявления
+					startActivity(intNews); //Переходим на экран с объявлениями
+					break;
 				}
 			}
 			
 		};
 		
 		btnMarks.setOnClickListener(onCl); //Присваеваем обработчик нажатий кнопке перехода на оценки
+		btnNews.setOnClickListener(onCl);
 		
 		for (int i = 0; i < 6; i += 1) { //Заполнение массивов с уроками и массивов с номерами уроков пустыми строками
 			for (int j = 0; j < 15; j += 1) {
@@ -115,6 +124,17 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 				showSchedule(3, day);
 			}
 		}
+	}
+	
+	//Обработка нажатия на кнопку назад
+	//Активити закроется только если кнопка нажата два раза подряд
+	@Override
+	public void onBackPressed() { 
+		if (back_pressed + 2000 > System.currentTimeMillis())
+			super.onBackPressed();
+		else
+			Toast.makeText(getBaseContext(), "Для выхода нажмите кнопку \"назад\" еще раз.", Toast.LENGTH_SHORT).show();
+		back_pressed = System.currentTimeMillis();
 	}
 	
 	//Функция вывода расписания на экран

@@ -1,10 +1,29 @@
 package com.netcity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Random;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
+
 import android.app.Activity;
+import android.content.Intent;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TableRow.LayoutParams;
@@ -12,10 +31,13 @@ import android.widget.TextView;
 
 public class MarksScreen extends Activity {
 
-	final static int nOfLessons = 20;
-	final static int month1Days = 26;
-	final static int month2Days = 27;
-	final static int month3Days = 24;
+	//Кнопки
+	Button btnSchedule, btnNews;
+	
+	int nOfLessons = 20;
+	int month1Days = 26;
+	int month2Days = 27;
+	int month3Days = 24;
 	String[] months = {"Декабрь", "Январь", "Февраль"};
 	String[][] marks = { {"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""},
 	{"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""},
@@ -52,6 +74,11 @@ public class MarksScreen extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_marks_screen);
 		
+		final Intent intNews = new Intent(this, NewsScreen.class);
+		
+		btnSchedule = (Button) findViewById(R.id.btn_marks_schedule);
+		btnNews = (Button) findViewById(R.id.btn_marks_news);
+		
 		tlMarks = (TableLayout) findViewById(R.id.tl_marks);
 		tlLessons = (TableLayout) findViewById(R.id.tl_lessons);
 		tlAverage = (TableLayout) findViewById(R.id.tl_avg);
@@ -63,6 +90,28 @@ public class MarksScreen extends Activity {
 		tvMonth1 = (TextView) findViewById(R.id.tv_month1);
 		tvMonth2 = (TextView) findViewById(R.id.tv_month2);
 		tvMonth3 = (TextView) findViewById(R.id.tv_month3);
+		
+		OnClickListener onCl = new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				switch(v.getId())
+				{
+				case R.id.btn_marks_news: //Если кнопка перехода на объявления
+					startActivity(intNews); //Переходим на экран с объявлениями
+					finish();
+					break;
+				case R.id.btn_marks_schedule: //Если кнопка перехода на расписание
+					finish(); //Закрываем активити и попадаем на экран с расписанием
+					break;
+				}
+			}
+			
+		};
+		
+		btnSchedule.setOnClickListener(onCl);
+		btnNews.setOnClickListener(onCl);
 		
 		showMarks();
 	}
@@ -102,7 +151,7 @@ public class MarksScreen extends Activity {
 		
 		{//Выводим дни
 			{
-				tvMonth1.setText(months[1]);
+				tvMonth1.setText(months[0]);
 				for (int i = 1; i < month1Days + 1; i += 1) {
 					TextView tv = new TextView(this);
 					tv.setText("| " + i + " ");
@@ -110,7 +159,7 @@ public class MarksScreen extends Activity {
 				}
 			}
 			{
-				tvMonth2.setText(months[2]);
+				tvMonth2.setText(months[1]);
 				for (int i = 1; i < month2Days + 1; i += 1) {
 					TextView tv = new TextView(this);
 					tv.setText("| " + i + " ");
@@ -118,7 +167,7 @@ public class MarksScreen extends Activity {
 				}
 			}
 			{
-				tvMonth3.setText(months[3]);
+				tvMonth3.setText(months[2]);
 				for (int i = 1; i < month3Days + 1; i += 1) {
 					TextView tv = new TextView(this);
 					tv.setText("| " + i + " ");
@@ -147,5 +196,41 @@ public class MarksScreen extends Activity {
 			tr.addView(tv);
 			tlAverage.addView(tr);
 		}
+	}
+	
+	class Connector extends AsyncTask<String,Void,JSONObject> {
+
+		@Override
+		protected JSONObject doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			HttpClient client = new DefaultHttpClient();
+			HttpGet httpGet = new HttpGet(params[0]); //TODO подстановка нужного IP
+			HttpResponse response;
+			HttpEntity entity;
+			InputStream ins;
+			
+			
+			try {
+				response = client.execute(httpGet);
+				entity = response.getEntity();
+				ins = entity.getContent();
+				try {
+					String result;
+					BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "utf-8"), 256);
+					StringBuilder sb = new StringBuilder();
+					String line = null;
+					
+					while ((line = reader.readLine()) != null)  sb.append(line); 
+			    		result = sb.toString();
+			    	ins.close();
+			    	return new JSONObject(result);
+				} catch (Exception e) {}
+			} catch (ClientProtocolException e) { //TODO
+			} catch (IOException e) { //Ошибка когда нет соединения TODO
+				return null;
+			}
+			return null;
+		}
+		
 	}
 }

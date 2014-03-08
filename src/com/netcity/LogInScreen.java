@@ -49,6 +49,8 @@ public class LogInScreen extends Activity {
 	//Выпадающие списки
 	Spinner serverSlct;
 	
+	private static long back_pressed; //Для обработки двойного нажатия на кнопку назад
+	
 	//Вызывается при создании активити
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -124,11 +126,21 @@ public class LogInScreen extends Activity {
 		//TODO отправка логина и пароля на сервер		
 		Intent intent = new Intent(this, ScheduleScreen.class); //Создаем ссылку на страницу с расписанием
 		startActivity(intent); //Запуск станицы с расписанием
+		finish();
 	}
 
+	//Обработка нажатия на кнопку назад
+	//Активити закроется только если кнопка нажата два раза подряд
+	@Override
+	public void onBackPressed() { 
+		if (back_pressed + 2000 > System.currentTimeMillis())
+			super.onBackPressed();
+		else
+			Toast.makeText(getBaseContext(), "Для выхода нажмите кнопку \"назад\" еще раз.", Toast.LENGTH_SHORT).show();
+		back_pressed = System.currentTimeMillis();
+	}
+	
 	class ConnectorServer extends AsyncTask<String,Void,String> {
-
-		private Exception exception;//TODO
 		
 		@Override
 		protected String doInBackground(String... params) {
