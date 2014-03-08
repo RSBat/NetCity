@@ -1,15 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ma="http://schemas.android.com/apk/res-auto" >
+    xmlns:myApp="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/action_refresh"
         android:icon="@drawable/ic_action_refresh"
         android:title="@string/action_refresh"
-        ma:showAsAction="always" />
+        myApp:showAsAction="always" />
     
     <item
         android:id="@+id/action_logOut"
         android:title="@string/action_logOut"
-        ma:showAsAction="ifRoom" />
+        myApp:showAsAction="ifRoom" />
 
 </menu>

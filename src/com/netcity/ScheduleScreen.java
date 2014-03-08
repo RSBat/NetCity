@@ -251,7 +251,7 @@ public class ScheduleScreen extends ActionBarActivity implements scheduleShow, s
 			
 			TextView tvDay12 = new TextView(this);
 			tvDay12.setText(days[day + 1]);
-			tvDay12.setTextSize(34); //Изменяем размер текста
+			tvDay12.setTextSize(30); //Изменяем размер текста
 			llSchList2_xL.addView(tvDay12);
 			
 			for (int i = 0; i < 15; i += 1) {

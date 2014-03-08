@@ -87,8 +87,6 @@ public class LogInScreen extends ActionBarActivity {
 			serverSlct = (Spinner) findViewById(R.id.serverSelect); //Находим выпадающий список по id
 		
 			serverSlct.setAdapter(adapter); //Устанавливаем адаптер для выпадающего списка
-			
-			Toast.makeText(this, "Created", Toast.LENGTH_SHORT).show();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
