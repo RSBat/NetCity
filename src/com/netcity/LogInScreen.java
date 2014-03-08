@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.Socket;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
@@ -17,15 +16,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -33,7 +30,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class LogInScreen extends Activity {
+public class LogInScreen extends ActionBarActivity {
 
 	//Описание переменных
 	
@@ -90,6 +87,8 @@ public class LogInScreen extends Activity {
 			serverSlct = (Spinner) findViewById(R.id.serverSelect); //Находим выпадающий список по id
 		
 			serverSlct.setAdapter(adapter); //Устанавливаем адаптер для выпадающего списка
+			
+			Toast.makeText(this, "Created", Toast.LENGTH_SHORT).show();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -128,7 +127,7 @@ public class LogInScreen extends Activity {
 		startActivity(intent); //Запуск станицы с расписанием
 		finish();
 	}
-
+	
 	//Обработка нажатия на кнопку назад
 	//Активити закроется только если кнопка нажата два раза подряд
 	@Override

@@ -15,14 +15,14 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Intent;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class NewsScreen extends Activity {
+public class NewsScreen extends ActionBarActivity {
 
 	//Buttons
 	Button btnSchedule, btnMarks;

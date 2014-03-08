@@ -4,9 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
@@ -16,18 +13,17 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -39,7 +35,7 @@ import android.widget.Toast;
 import com.netcity.DaySelect.scheduleShow;
 import com.netcity.DaySelect_xLarge.scheduleShowL;
 
-public class ScheduleScreen extends FragmentActivity implements scheduleShow, scheduleShowL {
+public class ScheduleScreen extends ActionBarActivity implements scheduleShow, scheduleShowL {
 	
 	//Описание переменных
 	
@@ -53,6 +49,8 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 	
 	//JSON
 	JSONObject json = new JSONObject(); //JSON для оценок
+	
+	static int day = -1;
 	
 	private static long back_pressed; //Для обработки двойного нажатия на кнопку назад
 	
@@ -98,8 +96,9 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 		
 		getData(); //Вызываем функцию получения данных
 		
+		if (day == -1) day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2;
+		
 		if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) < 4) { //Выводим текущий день или завтрашний если сегодня воскресенье
-			int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2;
 			if (day == -1) {
 				day = 0;
 			}
@@ -110,7 +109,7 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 				showSchedule(1, day);
 			}
 		} else {
-			int day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2;
+			
 			if (day == -1) {
 				day = 0;
 			}
@@ -137,9 +136,22 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 		back_pressed = System.currentTimeMillis();
 	}
 	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	  super.onSaveInstanceState(savedInstanceState);
+	  savedInstanceState.putInt("day", day);
+	}
+	
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+	  super.onRestoreInstanceState(savedInstanceState);
+	  day = savedInstanceState.getInt("day", -1);
+	}
+	
 	//Функция вывода расписания на экран
 	public void showSchedule(int mode, int day) {
 		//TODO вывод расписания на экран
+		ScheduleScreen.day = day;
 		Fragment frSchList; //Фрагмент в котором будет показываться расписание
 		switch (mode)
 		{
@@ -277,7 +289,8 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.schedule_screen, menu);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.schedule_screen, menu);
 		return true;
 	}
 	
