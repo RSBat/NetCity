@@ -50,7 +50,7 @@
         
         <fragment
         	android:id="@+id/schList_xL"
-          	android:name="cocom.netcity.ScheduleList_xLarge"
+          	android:name="com.netcity.ScheduleList_xLarge"
           	android:layout_width="0dp"
         	android:layout_height="match_parent"
         	android:layout_weight="1" />

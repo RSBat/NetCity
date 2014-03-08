@@ -110,9 +110,9 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 			}
 			
 			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-				showSchedule(2, Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2);
+				showSchedule(2, day);
 			} else {
-				showSchedule(3, Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2);
+				showSchedule(3, day);
 			}
 		}
 	}
@@ -243,7 +243,7 @@ public class ScheduleScreen extends FragmentActivity implements scheduleShow, sc
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} 
 		
 		parse("Пн|1;2;3;4;5;6;1;2;3;4;5;6;|Биология;Физ-ра;Химия;Химия;ИЗО;География;-;-;-;-;-;-;" //TODO заменить для JSON
 				+ "(*)Вт|1;2;3;4;5;6;7;1;2;3;4;5;6;|Общест.;Фр.яз.;Анг.яз;Анг.яз;Рус.яз;-;-;-;-;-;-;-;-;"
