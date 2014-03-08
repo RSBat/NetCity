@@ -1,0 +1,173 @@
+package com.netcity;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.util.Iterator;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+public class LogInScreen extends Activity {
+
+	//Описание переменных
+	
+	//Поля ввода текста
+	EditText etUserName, etPassword; //Поля ввода логина и пароля соответственно
+	
+	//Чекбоксы
+	CheckBox chbRememberMe; //Отвечает за сохранение логина и пароля между сессиями (по словам Димы это не понадобится т.к. будет одноразовая авторизация)
+	
+	//Кнопки
+	Button btnLogIn; //Отправляет логин и пароль
+	
+	//Выпадающие списки
+	Spinner serverSlct;
+	
+	//Вызывается при создании активити
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState); //Хз зачем но надо
+		setContentView(R.layout.activity_log_in_screen); //Выбираем layout файл для активити
+		
+		//Присваеваем переменным соответствующие view
+		etUserName = (EditText) findViewById(R.id.et_userName); //Поле ввода логина
+		etPassword = (EditText) findViewById(R.id.et_password); //Поле ввода пароля
+		chbRememberMe = (CheckBox) findViewById(R.id.chb_rememberMe); //Чекбокс спрашивающий надо ли сохранять логин и пароль
+		btnLogIn = (Button) findViewById(R.id.btn_logIn); //Кнопка для отправки логина и пароля
+		
+		getServers(); //Вызов функции отвечающей за получение списка школ
+		
+	}
+
+	public void getServers() { //Функция для заполнения выпадающего списка
+		ConnectorServer connection = new ConnectorServer();
+		connection.execute("http://195.88.220.90/v1/login/srv_list");
+		try {
+			String result = connection.get();
+			JSONObject json = new JSONObject(result);
+			String[] servers = new String[json.length()]; //Создаем архив для школ
+			
+			Iterator<String> inter = json.keys(); //Получаем ключи для значений в JSON'e и заносим их в Iterator
+		
+			Integer i = 0; //Создаем счетчик i
+		
+			while (inter.hasNext() == true) { //Цикл для заполнения массива школами
+				servers[i] = inter.next(); //Заполняем ячейку массива школой
+				i += 1; //Увеличчиваем счетчик на 1
+			}
+		
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, servers); //Создаем адаптер для выпадающего списка используя массив с школами
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); //Продолжение
+		
+			serverSlct = (Spinner) findViewById(R.id.serverSelect); //Находим выпадающий список по id
+		
+			serverSlct.setAdapter(adapter); //Устанавливаем адаптер для выпадающего списка
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	//Создаем меню по xml файлу
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.log_in_screen, menu); //Загружаем меню из файла
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		getServers();
+		Toast.makeText(this, "Обновлено", Toast.LENGTH_SHORT).show();
+		return true;
+	}
+	
+	//Выход пользователя
+	public void logOut(View v) {
+		//TODO отправка данных на сервер для выхода из нетскула
+	}
+	
+	//Отправка логина и пароля и в случае удачи переход на расписание
+	public void logIn(View v) {
+		//TODO отправка логина и пароля на сервер		
+		Intent intent = new Intent(this, ScheduleScreen.class); //Создаем ссылку на страницу с расписанием
+		startActivity(intent); //Запуск станицы с расписанием
+	}
+
+	class ConnectorServer extends AsyncTask<String,Void,String> {
+
+		private Exception exception;//TODO
+		
+		@Override
+		protected String doInBackground(String... params) {
+			// TODO Auto-generated method stub
+			HttpClient client = new DefaultHttpClient(); //Создаем стандартный HTTP клиент
+			HttpGet httpGet = new HttpGet(params[0]); //Создаем Get-запрос на сервер
+			HttpResponse response; //Отвечает за ответ
+			HttpEntity entity; //Хз что это
+			InputStream ins; //Поток с пришедшими данными
+			
+			try {
+				response = client.execute(httpGet); //Получения ответа на Get-запрос
+				entity = response.getEntity(); //Хз что это
+				ins = entity.getContent(); //Получаем поток из пришедших данных
+				try {
+					String result = null; //Строка с результатом
+					BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "utf-8"), 256); //Буффер с данными из полученного потока
+					StringBuilder sb = new StringBuilder(); //Конструктор строк для получения готовой строки
+					String line = null; //Строка из буффера
+					
+					while ((line = reader.readLine()) != null)  sb.append(line); //Получаем данные из буфера и заносим их в конструктор строк
+			    	
+					result = sb.toString(); //Получаем готовую строку
+			    	ins.close(); //Закрываем поток с полученными данными
+			    	
+			    	return result;
+				} catch (Exception e) {}
+			} catch (ClientProtocolException e) { //TODO
+			} catch (IOException e) { //Ошибка когда нет соединения
+				return "";
+			}
+			return "";
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			if (result == "") btnLogIn.setEnabled(false);
+			else btnLogIn.setEnabled(true);
+		}
+	}
+}

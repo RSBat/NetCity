@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">NetCity</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_refresh">Обновить</string>
+    <string name="userName">Имя пользователя</string>
+    <string name="password">Пароль</string>
+    <string name="rememberMe">Запомнить меня?</string>
+    <string name="logIn">Вход</string>
+    <string name="title_activity_schedule_screen">Расписание</string>
+    <string name="schedule">Расписание</string>
+    <string name="news">Объявления</string>
+    <string name="marks">Оценки</string>
+    <string name="monday_short">ПН</string>
+    <string name="tuesday_short">ВТ</string>
+    <string name="wednesday_short">СР</string>
+    <string name="thursday_short">ЧТ</string>
+    <string name="friday_short">ПТ</string>
+    <string name="saturday_short">СБ</string>
+    <string name="title_activity_news_screen">Объявления</string>
+    <string name="monday_tuesday_short">ПН ВТ</string>
+    <string name="wednesday_thursday_short">СР ЧТ</string>
+    <string name="friday_saturday_short">ПТ СБ</string>
+    <string name="title_activity_marks_screen">Оценки</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_logOut">Выход</string>
+
+</resources>
