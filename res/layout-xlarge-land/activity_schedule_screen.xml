@@ -51,6 +51,8 @@
         <fragment
         	android:id="@+id/schList_xL_L"
           	android:name="com.netcity.ScheduleList_xLarge"
+          	android:layout_marginLeft="10dp"
+          	android:layout_marginTop="10dp"
           	android:layout_width="0dp"
         	android:layout_height="match_parent"
         	android:layout_weight="1" />
