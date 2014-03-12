@@ -27,7 +27,7 @@ public class NewsScreen extends Fragment {
 	Button btnSchedule, btnMarks;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.activity_news_screen, null);
+		View v = inflater.inflate(R.layout.news_screen, null);
 		return v;
 	}
 
