@@ -46,7 +46,7 @@ public class ScheduleScreen extends Fragment {
 	
 	//Вызывается при создании активити
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.activity_schedule_screen, null);
+		View v = inflater.inflate(R.layout.schedule_screen, null);
 		
 		llSchedule1 = (LinearLayout) v.findViewById(R.id.ll_schedule_1);
 		llSchedule2 = (LinearLayout) v.findViewById(R.id.ll_schedule_2);
