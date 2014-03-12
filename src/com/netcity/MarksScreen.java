@@ -15,21 +15,15 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
-import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TableRow.LayoutParams;
 import android.widget.TextView;
 
-public class MarksScreen extends ActionBarActivity {
-
-	//Кнопки
-	Button btnSchedule, btnNews;
+public class MarksScreen extends Fragment {
 	
 	int nOfLessons = 20;
 	int month1Days = 26;
@@ -66,58 +60,23 @@ public class MarksScreen extends ActionBarActivity {
 	TableRow trMonth1, trMonth2, trMonth3;
 	TextView tvMonth1, tvMonth2, tvMonth3;
 	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_marks_screen);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View v = inflater.inflate(R.layout.marks_screen, null);
 		
-		final Intent intNews = new Intent(this, NewsScreen.class);
+		tlMarks = (TableLayout) v.findViewById(R.id.tl_marks);
+		tlLessons = (TableLayout) v.findViewById(R.id.tl_lessons);
+		tlAverage = (TableLayout) v.findViewById(R.id.tl_avg);
 		
-		btnSchedule = (Button) findViewById(R.id.btn_marks_schedule);
-		btnNews = (Button) findViewById(R.id.btn_marks_news);
+		trMonth1 = (TableRow) v.findViewById(R.id.tr_month1);
+		trMonth2 = (TableRow) v.findViewById(R.id.tr_month2);
+		trMonth3 = (TableRow) v.findViewById(R.id.tr_month3);
 		
-		tlMarks = (TableLayout) findViewById(R.id.tl_marks);
-		tlLessons = (TableLayout) findViewById(R.id.tl_lessons);
-		tlAverage = (TableLayout) findViewById(R.id.tl_avg);
+		tvMonth1 = (TextView) v.findViewById(R.id.tv_month1);
+		tvMonth2 = (TextView) v.findViewById(R.id.tv_month2);
+		tvMonth3 = (TextView) v.findViewById(R.id.tv_month3);
 		
-		trMonth1 = (TableRow) findViewById(R.id.tr_month1);
-		trMonth2 = (TableRow) findViewById(R.id.tr_month2);
-		trMonth3 = (TableRow) findViewById(R.id.tr_month3);
-		
-		tvMonth1 = (TextView) findViewById(R.id.tv_month1);
-		tvMonth2 = (TextView) findViewById(R.id.tv_month2);
-		tvMonth3 = (TextView) findViewById(R.id.tv_month3);
-		
-		OnClickListener onCl = new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				switch(v.getId())
-				{
-				case R.id.btn_marks_news: //Если кнопка перехода на объявления
-					startActivity(intNews); //Переходим на экран с объявлениями
-					finish();
-					break;
-				case R.id.btn_marks_schedule: //Если кнопка перехода на расписание
-					finish(); //Закрываем активити и попадаем на экран с расписанием
-					break;
-				}
-			}
-			
-		};
-		
-		btnSchedule.setOnClickListener(onCl);
-		btnNews.setOnClickListener(onCl);
-		
-		showMarks();
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.marks_screen, menu);
-		return true;
+		//showMarks(); TODO
+		return v;
 	}
 
 	public void getData() {
@@ -128,7 +87,7 @@ public class MarksScreen extends ActionBarActivity {
 		
 	}
 	
-	public void showMarks() {
+	/*public void showMarks() { TODO
 		for (int i = 0; i < nOfLessons / 2; i += 1) {
 			{
 				TableRow tr = new TableRow(this);
@@ -193,7 +152,7 @@ public class MarksScreen extends ActionBarActivity {
 			tr.addView(tv);
 			tlAverage.addView(tr);
 		}
-	}
+	}*/
 	
 	class Connector extends AsyncTask<String,Void,JSONObject> {
 

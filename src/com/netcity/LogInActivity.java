@@ -30,7 +30,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class LogInScreen extends ActionBarActivity {
+public class LogInActivity extends ActionBarActivity {
 
 	//Описание переменных
 	
@@ -120,8 +120,8 @@ public class LogInScreen extends ActionBarActivity {
 	
 	//Отправка логина и пароля и в случае удачи переход на расписание
 	public void logIn(View v) {
-		//TODO отправка логина и пароля на сервер		
-		Intent intent = new Intent(this, ScheduleScreen.class); //Создаем ссылку на страницу с расписанием
+		//TODO отправка логина и пароля на сервер	
+		Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием //TODO переписать
 		startActivity(intent); //Запуск станицы с расписанием
 		finish();
 	}
@@ -175,8 +175,8 @@ public class LogInScreen extends ActionBarActivity {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			if (result == "") btnLogIn.setEnabled(false);
-			else btnLogIn.setEnabled(true);
+			if (result == "") Toast.makeText(getApplication(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();//btnLogIn.setEnabled(false);
+			//else btnLogIn.setEnabled(true);
 		}
 	}
 }

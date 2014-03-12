@@ -15,32 +15,22 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.netcity.DaySelect.scheduleShow;
-import com.netcity.DaySelect_xLarge.scheduleShowL;
-
-public class ScheduleScreen extends ActionBarActivity implements scheduleShow, scheduleShowL {
+public class ScheduleScreen extends Fragment {
 	
 	//Описание переменных
 	
-	//
-	Button btnMarks, btnNews;
+	LinearLayout llSchedule1, llSchedule2;
 	
 	//Массивы строк
 	String[] days = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"}; //Дни недели (Скоро не понадобится)
@@ -50,217 +40,70 @@ public class ScheduleScreen extends ActionBarActivity implements scheduleShow, s
 	//JSON
 	JSONObject json = new JSONObject(); //JSON для оценок
 	
-	static int day = -1;
+	Button btnMonday, btnTuesday, btnWednesday, btnThursday, btnFriday, btnSaturday;
 	
-	private static long back_pressed; //Для обработки двойного нажатия на кнопку назад
+	int day = 0;
 	
 	//Вызывается при создании активити
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState); //Вызываем стандартный конструктор
-		setContentView(R.layout.activity_schedule_screen); //Присвайваем layout файл
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View v = inflater.inflate(R.layout.activity_schedule_screen, null);
 		
-		btnMarks = (Button) findViewById(R.id.btn_schedule_marks); //Находим кнопку для перехода на оценки
-		btnNews = (Button) findViewById(R.id.btn_schedule_news); //Находим кнопку для перехода на объявления
+		llSchedule1 = (LinearLayout) v.findViewById(R.id.ll_schedule_1);
+		llSchedule2 = (LinearLayout) v.findViewById(R.id.ll_schedule_2);
 		
-		final Intent intMarks = new Intent(this, MarksScreen.class); //Создаем ссылку на активити с оценками
-		final Intent intNews = new Intent(this, NewsScreen.class); //Создаем ссылку на активити с объявлениями
-		
-		OnClickListener onCl = new OnClickListener() { //Создаем обработчик нажатий для кнопки
-
-			@Override
-			public void onClick(View btn) { //Событие нажатия
-				// TODO Auto-generated method stub
-				switch (btn.getId()) //Определение кнопки
-				{
-				case R.id.btn_schedule_marks: //Если кнопка перехода на оценки
-					startActivity(intMarks); //Переходим на экран с оценками
-					break;
-				case R.id.btn_schedule_news: //Если кнопка перехода на объявления
-					startActivity(intNews); //Переходим на экран с объявлениями
-					break;
-				}
-			}
-			
-		};
-		
-		btnMarks.setOnClickListener(onCl); //Присваеваем обработчик нажатий кнопке перехода на оценки
-		btnNews.setOnClickListener(onCl);
-		
-		for (int i = 0; i < 6; i += 1) { //Заполнение массивов с уроками и массивов с номерами уроков пустыми строками
-			for (int j = 0; j < 15; j += 1) {
-				lessonsNums[i][j] = "";
-				lessons[i][j] = "";
-			}
-		}
+		btnMonday = (Button) v.findViewById(R.id.btn_monday);
+		btnTuesday = (Button) v.findViewById(R.id.btn_tuesday);
+		btnWednesday = (Button) v.findViewById(R.id.btn_wednesday);
+		btnThursday = (Button) v.findViewById(R.id.btn_thursday);
+		btnFriday = (Button) v.findViewById(R.id.btn_friday);
+		btnSaturday = (Button) v.findViewById(R.id.btn_saturday);
 		
 		getData(); //Вызываем функцию получения данных
 		
-		if (day == -1) day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2;
+		day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2;
 		
-		if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) < 4) { //Выводим текущий день или завтрашний если сегодня воскресенье
-			if (day == -1) {
-				day = 0;
-			}
-			
-			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-				showSchedule(0, day);
-			} else {
-				showSchedule(1, day);
-			}
-		} else {
-			
-			if (day == -1) {
-				day = 0;
-			}
-			if (day % 2 == 1) {
-				day -= 1;
-			}
-			
-			if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-				showSchedule(2, day);
-			} else {
-				showSchedule(3, day);
-			}
+		if (day == -1) {
+			day = 5;
 		}
-	}
-	
-	//Обработка нажатия на кнопку назад
-	//Активити закроется только если кнопка нажата два раза подряд
-	@Override
-	public void onBackPressed() { 
-		if (back_pressed + 2000 > System.currentTimeMillis())
-			super.onBackPressed();
-		else
-			Toast.makeText(getBaseContext(), "Для выхода нажмите кнопку \"назад\" еще раз.", Toast.LENGTH_SHORT).show();
-		back_pressed = System.currentTimeMillis();
-	}
-	
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-	  super.onSaveInstanceState(savedInstanceState);
-	  savedInstanceState.putInt("day", day);
-	}
-	
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-	  super.onRestoreInstanceState(savedInstanceState);
-	  day = savedInstanceState.getInt("day", -1);
+		return v;
 	}
 	
 	//Функция вывода расписания на экран
-	public void showSchedule(int mode, int day) {
+	public void showSchedule() {
 		//TODO вывод расписания на экран
-		ScheduleScreen.day = day;
-		Fragment frSchList; //Фрагмент в котором будет показываться расписание
-		switch (mode)
-		{
-		case 0: //Если Portrait phone
-			frSchList = getSupportFragmentManager().findFragmentById(R.id.schList); //Находим нужный фрагмент по id
-			LinearLayout llSchList = (LinearLayout) frSchList.getView().findViewById(R.id.llSchList1); //Получаем LinearLayout из фрагмента
-			llSchList.removeAllViews(); //Убираем все дочерние элементы из LinearLayout
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+			TextView tvDay1 = new TextView(getActivity());
+			tvDay1.setText("Day" + day);
+			llSchedule1.addView(tvDay1);
 			
-			TextView dayOfWeek = (TextView) frSchList.getView().findViewById(R.id.tvDayOfWeek); //Находим TextView отвечающий за день недели
-			dayOfWeek.setText(days[day]); //Задаем текст для TextView отвечающего за день недели
-			
-			for (int i = 0; i < 15; i += 1) { //Цикл для заполнения LinearLayout из фрагмента расписанием
-				TextView tvLesson = new TextView(this); //Создаем новый TextVeiw 
-				tvLesson.setText(lessonsNums[day][i] + "" + lessons[day][i]); //Задаем текст для TextView в виде номера урока и самого урока
-				tvLesson.setTextSize(18); //Изменяем размер текста
-				llSchList.addView(tvLesson); //Ставим TextView в LinearLayout
+			for (int i = 0; i < 10; i += 1) {
+				TextView tvLesson = new TextView(getActivity());
+				tvLesson.setText(i + ". Lesson");
+				tvLesson.setTextSize(20);
+				llSchedule1.addView(tvLesson);
 			}
-			break;
+		} else {
+			TextView tvDay1 = new TextView(getActivity());
+			tvDay1.setText("Day" + day);
+			llSchedule1.addView(tvDay1);
 			
-		case 1: //Если landscape phone
-			frSchList = getSupportFragmentManager().findFragmentById(R.id.schListL); //Находим фрагмент по id
-			LinearLayout llSchList1 = (LinearLayout) frSchList.getView().findViewById(R.id.llSchList1); //Находим LinearLayout для вывода первой смены
-			LinearLayout llSchList2 = (LinearLayout) frSchList.getView().findViewById(R.id.llSchList2); //Находим LinearLayout для вывода второй смены
-			TextView dayOfWeekL = (TextView) frSchList.getView().findViewById(R.id.tvDayOfWeek); //Находим TextView отвечающий за день недели
 			byte count1 = 0; //Счетчик отвечающий за смену
-			
-			dayOfWeekL.setText(days[day]); //Задаем текст для TextView отвечающего за день недели
-			llSchList1.removeAllViews(); //Очищаем первый LinearLayout
-			llSchList2.removeAllViews(); //Очищаем второй LinearLayout
 			
 			for (int i = 0; i < 15; i += 1) { //Цикл заполнения LinearLayout'ов расписанием
 				if (lessonsNums[day][i].equals("1.")) { //Если это первый урок в смене
 					count1 += 1; //То увеличиваем счетчик на 1
 				}
 				
-				TextView tvLesson = new TextView(this); //Создаем новый TextView
+				TextView tvLesson = new TextView(getActivity()); //Создаем новый TextView
 				tvLesson.setText(lessonsNums[day][i] + "" + lessons[day][i]); //Заполняем TextView номером урока и уроком
 				tvLesson.setTextSize(18); //Изменяем размер текста
 				
 				if (count1 == 2) {
-					llSchList2.addView(tvLesson);
+					llSchedule2.addView(tvLesson);
 				} else {
-					llSchList1.addView(tvLesson);
+					llSchedule1.addView(tvLesson);
 				}
 			}
-			break;
-			
-		case 2: //Если portrait tablet
-			frSchList = getSupportFragmentManager().findFragmentById(R.id.schList_xL);
-			LinearLayout llSchList_xL = (LinearLayout) frSchList.getView().findViewById(R.id.llSchList1L);
-			llSchList_xL.removeAllViews();
-			
-			TextView tvDay = new TextView(this); //Находим TextView отвечающий за первый день недели
-			tvDay.setText(days[day]); //Задаем текст для TextView отвечающего за первый день недели
-			tvDay.setTextSize(30); //Изменяем размер текста
-			llSchList_xL.addView(tvDay);
-			
-			for (int i = 0; i < 15; i += 1) {
-				TextView tvLesson = new TextView(this);
-				tvLesson.setText(lessonsNums[day][i] + "" + lessons[day][i]);
-				tvLesson.setTextSize(20);
-				llSchList_xL.addView(tvLesson);
-			}
-			
-			TextView tvDay2 = new TextView(this); //Находим TextView отвечающий за второй день недели
-			tvDay2.setText(days[day + 1]); //Задаем текст для TextView отвечающего за второй день недели
-			tvDay2.setTextSize(34); //Изменяем размер текста
-			llSchList_xL.addView(tvDay2);
-			
-			for (int i = 0; i < 15; i += 1) {
-				TextView tvLesson = new TextView(this);
-				tvLesson.setText(lessonsNums[day + 1][i] + "" + lessons[day + 1][i]);
-				tvLesson.setTextSize(20);
-				llSchList_xL.addView(tvLesson);
-			}
-			break;
-			
-		case 3: //Если landscape tablet
-			frSchList = getSupportFragmentManager().findFragmentById(R.id.schList_xL_L);
-			LinearLayout llSchList1_xL = (LinearLayout) frSchList.getView().findViewById(R.id.llSchList1L);
-			LinearLayout llSchList2_xL = (LinearLayout) frSchList.getView().findViewById(R.id.llSchList2L);
-			
-			llSchList1_xL.removeAllViews();
-			llSchList2_xL.removeAllViews();
-			
-			TextView tvDay1 = new TextView(this);
-			tvDay1.setText(days[day]); //Задаем текст для TextView отвечающего за день недели
-			tvDay1.setTextSize(30); //Изменяем размер текста
-			llSchList1_xL.addView(tvDay1);
-			
-			for (int i = 0; i < 15; i += 1) {
-				TextView tvLesson = new TextView(this);
-				tvLesson.setText(lessonsNums[day][i] + "" + lessons[day][i]);
-				tvLesson.setTextSize(20);
-				llSchList1_xL.addView(tvLesson);
-			}
-			
-			TextView tvDay12 = new TextView(this);
-			tvDay12.setText(days[day + 1]);
-			tvDay12.setTextSize(30); //Изменяем размер текста
-			llSchList2_xL.addView(tvDay12);
-			
-			for (int i = 0; i < 15; i += 1) {
-				TextView tvLesson = new TextView(this);
-				tvLesson.setText(lessonsNums[day + 1][i] + "" + lessons[day + 1][i]);
-				tvLesson.setTextSize(20);
-				llSchList2_xL.addView(tvLesson);
-			}
-			break;
 		}
 	}
 
@@ -276,84 +119,6 @@ public class ScheduleScreen extends ActionBarActivity implements scheduleShow, s
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		
-		parse("Пн|1;2;3;4;5;6;1;2;3;4;5;6;|Биология;Физ-ра;Химия;Химия;ИЗО;География;-;-;-;-;-;-;" //TODO заменить для JSON
-				+ "(*)Вт|1;2;3;4;5;6;7;1;2;3;4;5;6;|Общест.;Фр.яз.;Анг.яз;Анг.яз;Рус.яз;-;-;-;-;-;-;-;-;"
-				+ "(*)Ср|1;2;3;4;5;6;7;1;2;3;4;5;|--;--;--;--;--;--;--;-;-;-;-;-;"
-				+ "(*)Чт|1;2;3;4;5;6;7;1;2;3;4;5;6;|Физ-ра;Рус.яз;ИЗО;Технол.;Анг.яз;Анг.яз;-;-;-;-;-;-;-;"
-				+ "(*)Пт|1;2;3;4;5;6;1;2;3;4;5;|--;--;--;--;--;--;-;-;-;-;-;"
-				+ "(*)Сб|1;2;3;4;5;6;|--;--;--;--;--;--;");
-		}
-
-	//Создаем меню по xml файлу
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.schedule_screen, menu);
-		return true;
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId())
-		{
-		case R.id.action_refresh:
-			getData();
-			Toast.makeText(this, "Обновлено", Toast.LENGTH_SHORT).show();
-			break;
-		case R.id.action_logOut:
-			//TODO выход из системы
-			break;
-		}
-		return true;
-	}
-	
-	public void parse(String str) { //Разделяем полученную строку на элементы с которыми будем работать //TODO переписать для JSON
-		int index = str.length();
-		String[] daySchedule = new String[6];
-		
-		for (int i = 5; i >= 1; i -= 1) { //Выделяем строки с днями недели
-			int indexN = str.lastIndexOf("(*)", index - 1);
-			daySchedule[i] = str.substring(indexN, index);
-			Log.w("MYLOG", "dSch" + daySchedule[i]);
-			index = indexN;
-		}
-		
-		daySchedule[0] = str.substring(0, index);
-		Log.w("MYLOG", daySchedule[0]);
-		
-		for (int i = 0; i < 6; i += 1) {
-			StringBuilder sb = new StringBuilder(10);
-			int k = 0;
-			
-			index = daySchedule[i].indexOf("|");
-			
-			sb.insert(0, daySchedule[i].substring(index+1, daySchedule[i].indexOf("|", index+1)));
-			Log.w("MYLOG", sb.toString());
-			
-			while (sb.length() > 0) { //Выделяем номера уроков
-				lessonsNums[i][k] = sb.substring(0, sb.indexOf(";")) + ".";
-				sb.delete(0, sb.indexOf(";")+1);
-				k += 1;
-				Log.w("MYLOG", sb.toString());
-			}
-			
-			index = daySchedule[i].indexOf("|", index + 1);
-			
-			sb.insert(0, daySchedule[i].substring(index + 1));
-			
-			Log.w("MYLOG","prLessons" + sb.toString());
-			
-			k = 0;
-			
-			while (sb.length() > 0) { //Выделяем уроки
-				lessons[i][k] = sb.substring(0, sb.indexOf(";"));
-				sb.delete(0, sb.indexOf(";")+1);
-				Log.w("MYLOG", "lessons " + lessons[i][k]);
-				k += 1;
-			}
-		}
 	}
 	
 	class Connector extends AsyncTask<String,Void,JSONObject> {

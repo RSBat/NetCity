@@ -23,7 +23,6 @@
     <string name="wednesday_thursday_short">СР ЧТ</string>
     <string name="friday_saturday_short">ПТ СБ</string>
     <string name="title_activity_marks_screen">Оценки</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_logOut">Выход</string>
 
 </resources>
