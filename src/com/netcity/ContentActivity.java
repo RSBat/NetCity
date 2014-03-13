@@ -6,13 +6,16 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 public class ContentActivity extends ActionBarActivity {
@@ -41,7 +44,7 @@ public class ContentActivity extends ActionBarActivity {
 		tab = actionBar.newTab().setText("ќценки").setTabListener(new TabListener<MarksScreen>(this, "ќценки", MarksScreen.class));
 		actionBar.addTab(tab);
 		
-		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_showNotif", false));
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 	}
 
@@ -50,6 +53,18 @@ public class ContentActivity extends ActionBarActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.content_screen, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId())
+		{
+		case R.id.action_settings:
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+			break;
+		}
 		return true;
 	}
 	

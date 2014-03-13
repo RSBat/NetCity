@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory
+       	android:key=""
+       	android:title="Уведомления"  >
+    
+    	<CheckBoxPreference
+        	android:key="pref_notif_showNotif"
+        	android:title="Включить уведомления"
+        	android:defaultValue="false" />
+    	
+    	<Preference
+    	    android:key="pref_notif_time"
+    	    android:title="Время"
+    	    android:dependency="pref_notif_showNotif" />
+	</PreferenceCategory>
+    
+</PreferenceScreen>
