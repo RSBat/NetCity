@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">NetCity</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Настройки</string>
     <string name="action_refresh">Обновить</string>
     <string name="userName">Имя пользователя</string>
     <string name="password">Пароль</string>

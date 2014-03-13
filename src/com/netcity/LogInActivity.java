@@ -16,9 +16,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -121,7 +126,7 @@ public class LogInActivity extends ActionBarActivity {
 	//Отправка логина и пароля и в случае удачи переход на расписание
 	public void logIn(View v) {
 		//TODO отправка логина и пароля на сервер	
-		Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием //TODO переписать
+		Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
 		startActivity(intent); //Запуск станицы с расписанием
 		finish();
 	}

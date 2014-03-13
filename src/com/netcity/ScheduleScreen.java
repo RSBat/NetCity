@@ -65,6 +65,9 @@ public class ScheduleScreen extends Fragment {
 		if (day == -1) {
 			day = 5;
 		}
+		
+		showSchedule();
+		
 		return v;
 	}
 	
@@ -90,15 +93,12 @@ public class ScheduleScreen extends Fragment {
 			byte count1 = 0; //Счетчик отвечающий за смену
 			
 			for (int i = 0; i < 15; i += 1) { //Цикл заполнения LinearLayout'ов расписанием
-				if (lessonsNums[day][i].equals("1.")) { //Если это первый урок в смене
-					count1 += 1; //То увеличиваем счетчик на 1
-				}
 				
 				TextView tvLesson = new TextView(getActivity()); //Создаем новый TextView
-				tvLesson.setText(lessonsNums[day][i] + "" + lessons[day][i]); //Заполняем TextView номером урока и уроком
+				tvLesson.setText(i + ". Lesson"); //Заполняем TextView номером урока и уроком
 				tvLesson.setTextSize(18); //Изменяем размер текста
 				
-				if (count1 == 2) {
+				if (i > 7) {
 					llSchedule2.addView(tvLesson);
 				} else {
 					llSchedule1.addView(tvLesson);

@@ -3,24 +3,37 @@ package com.netcity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.widget.Toast;
 
 public class ContentActivity extends ActionBarActivity {
 
+	private static long back_pressed;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// Set up the action bar.
 		final ActionBar actionBar = getSupportActionBar();
+		Tab tab;
 		
-		Tab tab = actionBar.newTab().setText("Расписание").setTabListener(new TabListener<ScheduleScreen_xLarge>(this, "Расписание", ScheduleScreen_xLarge.class));
-		actionBar.addTab(tab);
+		if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4){
+			tab = actionBar.newTab().setText("Расписание").setTabListener(new TabListener<ScheduleScreen_xLarge>(this, "Расписание", ScheduleScreen_xLarge.class));
+			actionBar.addTab(tab);
+		} else {
+			tab = actionBar.newTab().setText("Расписание").setTabListener(new TabListener<ScheduleScreen>(this, "Расписание", ScheduleScreen.class));
+			actionBar.addTab(tab);
+		}
 		
 		tab = actionBar.newTab().setText("Объявления").setTabListener(new TabListener<NewsScreen>(this, "Объявления", NewsScreen.class));
 		actionBar.addTab(tab);
@@ -36,8 +49,17 @@ public class ContentActivity extends ActionBarActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.schedule_screen, menu);
+		inflater.inflate(R.menu.content_screen, menu);
 		return true;
+	}
+	
+	@Override
+	public void onBackPressed() {
+	if (back_pressed + 2000 > System.currentTimeMillis())
+	super.onBackPressed();
+	else
+	Toast.makeText(getBaseContext(), "Для выхода нажмите кнопку \"назад\" еще раз.", Toast.LENGTH_SHORT).show();
+	back_pressed = System.currentTimeMillis();
 	}
 	
 	class TabListener<T extends Fragment> implements ActionBar.TabListener {
