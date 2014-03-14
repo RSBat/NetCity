@@ -7,6 +7,8 @@
     	<CheckBoxPreference
         	android:key="pref_notif_showNotif"
         	android:title="Включить уведомления"
+        	android:summaryOn="Уведомления включены"
+        	android:summaryOff="Уведомления выключены"
         	android:defaultValue="false" />
     	
     	<Preference
