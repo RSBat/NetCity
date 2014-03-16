@@ -67,6 +67,8 @@ public class LogInActivity extends ActionBarActivity {
 		
 		getServers(); //Вызов функции отвечающей за получение списка школ
 		
+		startService(new Intent(this, NotifService.class));
+		
 	}
 
 	public void getServers() { //Функция для заполнения выпадающего списка
