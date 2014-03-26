@@ -15,7 +15,9 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 
 public class NotifService extends Service {
 
@@ -66,6 +68,7 @@ public class NotifService extends Service {
 		        .setContentTitle("My notification")
 		        .setContentText("Hello World!")
 		        .setContentIntent(resultPendingIntent)
+		        .setDefaults(Notification.DEFAULT_ALL)
 		        .build();
 		
 		NotificationManager mNotificationManager =
@@ -85,14 +88,16 @@ public class NotifService extends Service {
 	    	while (true)
 	    	{
 	    		try {
-					TimeUnit.SECONDS.sleep(60);
+					TimeUnit.SECONDS.sleep(30);
 					if (sharedPref.getBoolean("pref_notif_showNotif", false)) {
-						StringBuilder sb = new StringBuilder();
-						sb.append(Calendar.HOUR_OF_DAY);
-						sb.append(":");
-						sb.append(Calendar.MINUTE);
 						Calendar c = Calendar.getInstance();
-						if (c.get(Calendar.HOUR_OF_DAY) == 22) {
+						
+						StringBuilder sb = new StringBuilder();
+						sb.append(c.get(Calendar.HOUR_OF_DAY));
+						sb.append(":");
+						sb.append(c.get(Calendar.MINUTE));
+						Log.w("MYLOG", sb.toString());
+						if (sb.toString().equals("16:0")) {
 							showNotif();
 						}
 					}
