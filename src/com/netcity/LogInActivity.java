@@ -181,7 +181,15 @@ public class LogInActivity extends ActionBarActivity {
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
 			if (result == "") Toast.makeText(getApplication(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();//btnLogIn.setEnabled(false);
-			//else btnLogIn.setEnabled(true);
+		}
+	}
+	
+	class Auth extends AsyncTask<String, Void, String> {
+
+		@Override
+		protected String doInBackground(String... arg0) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	}
 }

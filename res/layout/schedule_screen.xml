@@ -53,21 +53,40 @@
 	</LinearLayout>
 	
 	<LinearLayout
-	    android:id="@+id/ll_schedule_1"
 	    android:layout_width="0dp"
 	    android:layout_height="match_parent"
 	    android:layout_weight="1"
-	    android:orientation="vertical" >
+	   	android:orientation="vertical" >
+		
+		<TextView
+		    android:id="@+id/tv_dayOfWeek"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:textSize="24sp"
+		  	android:gravity="center" />
+		
+		<LinearLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal" >
+			
+			<LinearLayout
+	    		android:id="@+id/ll_schedule_1"
+	    		android:layout_width="0dp"
+			    android:layout_height="wrap_content"
+	    		android:layout_weight="1"
+	    		android:orientation="vertical" >
 	    
-	</LinearLayout>
+			</LinearLayout>
 	
-	<LinearLayout
-	    android:id="@+id/ll_schedule_2"
-	    android:layout_width="0dp"
-	    android:layout_height="match_parent"
-	    android:layout_weight="1"
-	    android:orientation="vertical" >
-	    
+			<LinearLayout
+	   			android:id="@+id/ll_schedule_2"
+	    		android:layout_width="0dp"
+	    		android:layout_height="wrap_content"
+	    		android:layout_weight="1"
+	    		android:orientation="vertical" >
+	    	</LinearLayout>
+		</LinearLayout>
 	</LinearLayout>
 	
 </LinearLayout>
