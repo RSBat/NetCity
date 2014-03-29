@@ -24,5 +24,7 @@
     <string name="friday_saturday_short">ПТ СБ</string>
     <string name="title_activity_marks_screen">Оценки</string>
     <string name="action_logOut">Выход</string>
+    <string name="drawer_open">Открыть навигацию</string>
+    <string name="drawer_close">Закрыть навигацию</string>
 
 </resources>

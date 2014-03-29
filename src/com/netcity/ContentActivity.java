@@ -1,51 +1,80 @@
 package com.netcity;
 
 
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
-import android.app.Notification;
-import android.app.NotificationManager;
+import android.support.v4.widget.DrawerLayout;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class ContentActivity extends ActionBarActivity {
 
 	private static long back_pressed;
 	
+	String[] mDrawerTitles = {"Расписание", "Объявления", "Оценки"};
+	private DrawerLayout mDrawerLayout;
+    ListView mDrawerList;
+    ActionBarDrawerToggle mDrawerToggle;
+
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_content_screen);
 
-		// Set up the action bar.
-		final ActionBar actionBar = getSupportActionBar();
-		Tab tab;
-		
-		if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4){
-			tab = actionBar.newTab().setText("Расписание").setTabListener(new TabListener<ScheduleScreen_xLarge>(this, "Расписание", ScheduleScreen_xLarge.class));
-			actionBar.addTab(tab);
-		} else {
-			tab = actionBar.newTab().setText("Расписание").setTabListener(new TabListener<ScheduleScreen>(this, "Расписание", ScheduleScreen.class));
-			actionBar.addTab(tab);
-		}
-		
-		tab = actionBar.newTab().setText("Объявления").setTabListener(new TabListener<NewsScreen>(this, "Объявления", NewsScreen.class));
-		actionBar.addTab(tab);
-		
-		tab = actionBar.newTab().setText("Оценки").setTabListener(new TabListener<MarksScreen>(this, "Оценки", MarksScreen.class));
-		actionBar.addTab(tab);
-		
-		actionBar.setDisplayShowTitleEnabled(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_showNotif", false));
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description */
+                R.string.drawer_close  /* "close drawer" description */
+                ) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle("Title");
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle(R.string.app_name);
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDrawerTitles));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+	    fragmentManager.beginTransaction()
+	                   .replace(R.id.content_frame, Fragment.instantiate(this, ScheduleScreen.class.getName()))
+	                   .commit();
 	}
 
 	@Override
@@ -58,6 +87,11 @@ public class ContentActivity extends ActionBarActivity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		if (mDrawerToggle.onOptionsItemSelected(item)) {
+	          return true;
+		}
+
 		switch (item.getItemId())
 		{
 		case R.id.action_settings:
@@ -65,17 +99,61 @@ public class ContentActivity extends ActionBarActivity {
 			startActivity(intent);
 			break;
 		}
+		
 		return true;
 	}
 	
 	@Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+	
+	@Override
 	public void onBackPressed() {
-	if (back_pressed + 2000 > System.currentTimeMillis())
-	super.onBackPressed();
-	else
-	Toast.makeText(getBaseContext(), "Для выхода нажмите кнопку \"назад\" еще раз.", Toast.LENGTH_SHORT).show();
-	back_pressed = System.currentTimeMillis();
+		if (back_pressed + 2000 > System.currentTimeMillis())
+			super.onBackPressed();
+		else
+			Toast.makeText(getBaseContext(), "Для выхода нажмите кнопку \"назад\" еще раз.", Toast.LENGTH_SHORT).show();
+		back_pressed = System.currentTimeMillis();
 	}
+	
+	private void selectItem(int position) {
+		Fragment fragment = null;
+	    // Create a new fragment and specify the planet to show based on position
+		switch (position) 
+		{
+		case 0:
+			fragment = Fragment.instantiate(this, ScheduleScreen.class.getName());
+			break;
+			
+		case 1:
+			fragment = Fragment.instantiate(this, NewsScreen.class.getName());
+			break;
+				
+		case 2:
+			fragment = Fragment.instantiate(this, MarksScreen.class.getName());
+			break;
+		}
+	    // Insert the fragment by replacing any existing fragment
+	    FragmentManager fragmentManager = getSupportFragmentManager();
+	    fragmentManager.beginTransaction()
+	                   .replace(R.id.content_frame, fragment)
+	                   .commit();
+
+	    // Highlight the selected item, update the title, and close the drawer
+	    mDrawerList.setItemChecked(position, true);
+	    setTitle(mDrawerTitles[position]);
+	    mDrawerLayout.closeDrawer(mDrawerList);
+	}
+
 	
 	class TabListener<T extends Fragment> implements ActionBar.TabListener {
 	    private Fragment mFragment;
@@ -120,4 +198,12 @@ public class ContentActivity extends ActionBarActivity {
 	        // User selected the already selected tab. Usually do nothing.
 	    }
 	}
+	
+	private class DrawerItemClickListener implements ListView.OnItemClickListener {
+	    @Override
+	    public void onItemClick(AdapterView parent, View view, int position, long id) {
+	        selectItem(position);
+	    }
+	}
+
 }
