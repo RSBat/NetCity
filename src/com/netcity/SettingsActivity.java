@@ -15,12 +15,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-
 public class SettingsActivity extends PreferenceActivity {
 	
 	Preference prefTime;
 	OnPreferenceClickListener onCl;
 	
+	@SuppressWarnings("deprecation")
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +42,7 @@ public class SettingsActivity extends PreferenceActivity {
 	
 	public void showTimePicker() {
 		DialogFragment newFragment = new TimePickerFragment();
-	    newFragment.show(getSupportFragmentManager(), "timePicker");
+	    //newFragment.show(getSupportFragmentManager(), "timePicker");
 	}
 	
 	public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
