@@ -39,7 +39,7 @@ public class ScheduleScreen extends Fragment {
 	TextView tvDayOfWeek;
 	
 	//Массивы строк
-	String[] days = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"}; //Дни недели (Скоро не понадобится)
+	String[] days = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"}; //Дни недели
 	String[][] lessons = new String[6][15]; //Массив с уроками
 	String[][] lessonsNums = new String[6][15]; //Массив с номерами уроков
 	
@@ -97,7 +97,7 @@ public class ScheduleScreen extends Fragment {
 					day = 5;
 					break;
 				}
-				//setBtnEnabled((Button) btn);
+				setBtnEnabled((Button) btn);
 				showSchedule();
 			}
 			
@@ -118,6 +118,33 @@ public class ScheduleScreen extends Fragment {
 			day = 5;
 		}
 		
+		switch (day)
+		{
+		case 0:
+			btnMonday.setEnabled(false);
+			break;
+			
+		case 1:
+			btnTuesday.setEnabled(false);
+			break;
+			
+		case 2:
+			btnWednesday.setEnabled(false);
+			break;
+			
+		case 3:
+			btnThursday.setEnabled(false);
+			break;
+			
+		case 4:
+			btnFriday.setEnabled(false);
+			break;
+			
+		case 5:
+			btnSaturday.setEnabled(false);
+			break;
+		}
+		
 		showSchedule();
 		
 		return v;
@@ -135,7 +162,7 @@ public class ScheduleScreen extends Fragment {
 				jsonDay = json.getJSONObject(day);
 				JSONArray jsonLessons = jsonDay.getJSONArray("lessons");
 				
-				tvDayOfWeek.setText(jsonDay.optString("day", "День недели"));
+				tvDayOfWeek.setText(days[day]);
 				
 				for (int i = 0; i < jsonLessons.length(); i += 1) {
 					JSONObject jsonLes;
@@ -145,6 +172,7 @@ public class ScheduleScreen extends Fragment {
 						tvLesson.setText(jsonLes.optInt("num") + ". " + jsonLes.optString("name"));
 						tvLesson.setTextSize(18);
 						llSchedule1.addView(tvLesson);
+						
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
 						//e.printStackTrace();
@@ -161,7 +189,7 @@ public class ScheduleScreen extends Fragment {
 				jsonDay = json.getJSONObject(day);
 				JSONArray jsonLessons = jsonDay.getJSONArray("lessons");
 				
-				tvDayOfWeek.setText(jsonDay.optString("day", "День недели"));
+				tvDayOfWeek.setText(days[day]);
 				
 				byte count1 = 0; //Счетчик отвечающий за смену
 				
@@ -209,6 +237,17 @@ public class ScheduleScreen extends Fragment {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
+	}
+	
+	public void setBtnEnabled(Button btn) {
+		btnMonday.setEnabled(true);
+		btnTuesday.setEnabled(true);
+		btnWednesday.setEnabled(true);
+		btnThursday.setEnabled(true);
+		btnFriday.setEnabled(true);
+		btnSaturday.setEnabled(true);
+		
+		btn.setEnabled(false);
 	}
 	
 	class Connector extends AsyncTask<String,Void,JSONObject> {

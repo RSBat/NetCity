@@ -25,10 +25,12 @@ public class ContentActivity extends ActionBarActivity {
 
 	private static long back_pressed;
 	
-	String[] mDrawerTitles = {"Расписание", "Объявления", "Оценки"};
+	final static String[] mDrawerTitles = {"Расписание", "Объявления", "Оценки"};
 	private DrawerLayout mDrawerLayout;
     ListView mDrawerList;
     ActionBarDrawerToggle mDrawerToggle;
+    
+    int screenSelected;
 
 	
 	@Override
@@ -50,7 +52,7 @@ public class ContentActivity extends ActionBarActivity {
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getSupportActionBar().setTitle("Title");
+                getSupportActionBar().setTitle(mDrawerTitles[screenSelected]);
             }
 
             /** Called when a drawer has settled in a completely open state. */
@@ -75,6 +77,9 @@ public class ContentActivity extends ActionBarActivity {
 	    fragmentManager.beginTransaction()
 	                   .replace(R.id.content_frame, Fragment.instantiate(this, ScheduleScreen.class.getName()))
 	                   .commit();
+	    
+	    screenSelected = 0;
+	    getSupportActionBar().setTitle(mDrawerTitles[screenSelected]);
 	}
 
 	@Override
@@ -152,52 +157,10 @@ public class ContentActivity extends ActionBarActivity {
 	    mDrawerList.setItemChecked(position, true);
 	    setTitle(mDrawerTitles[position]);
 	    mDrawerLayout.closeDrawer(mDrawerList);
+	    
+	    screenSelected = position;
 	}
 
-	
-	class TabListener<T extends Fragment> implements ActionBar.TabListener {
-	    private Fragment mFragment;
-	    private final ActionBarActivity mActivity;
-	    private final String mTag;
-	    private final Class<T> mClass;
-
-	    /** Constructor used each time a new tab is created.
-	      * @param activity  The host Activity, used to instantiate the fragment
-	      * @param tag  The identifier tag for the fragment
-	      * @param clz  The fragment's Class, used to instantiate the fragment
-	      */
-	    public TabListener(ActionBarActivity activity, String tag, Class<T> clz) {
-	        mActivity = activity;
-	        mTag = tag;
-	        mClass = clz;
-	    }
-
-	    /* The following are each of the ActionBar.TabListener callbacks */
-
-	    public void onTabSelected(Tab tab, FragmentTransaction ft) {
-	        // Check if the fragment is already initialized
-	        mActivity.getSupportActionBar().setTitle(mTag);
-	    	if (mFragment == null) {
-	            // If not, instantiate and add it to the activity
-	            mFragment = Fragment.instantiate(mActivity, mClass.getName());
-	            ft.add(android.R.id.content, mFragment, mTag);
-	        } else {
-	            // If it exists, simply attach it in order to show it
-	            ft.attach(mFragment);
-	        }
-	    }
-
-	    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-	        if (mFragment != null) {
-	            // Detach the fragment, because another one is being attached
-	            ft.detach(mFragment);
-	        }
-	    }
-
-	    public void onTabReselected(Tab tab, FragmentTransaction ft) {
-	        // User selected the already selected tab. Usually do nothing.
-	    }
-	}
 	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
