@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
@@ -16,14 +18,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,6 +48,8 @@ public class LogInActivity extends ActionBarActivity {
 	//Выпадающие списки
 	Spinner serverSlct;
 	
+	String[] servers = {""};
+	
 	private static long back_pressed; //Для обработки двойного нажатия на кнопку назад
 	
 	//Вызывается при создании активити
@@ -66,7 +65,6 @@ public class LogInActivity extends ActionBarActivity {
 		btnLogIn = (Button) findViewById(R.id.btn_logIn); //Кнопка для отправки логина и пароля
 		
 		getServers(); //Вызов функции отвечающей за получение списка школ
-		
 	}
 
 	public void getServers() { //Функция для заполнения выпадающего списка
@@ -75,18 +73,23 @@ public class LogInActivity extends ActionBarActivity {
 		try {
 			String result = connection.get();
 			JSONObject json = new JSONObject(result);
-			String[] servers = new String[json.length()]; //Создаем архив для школ
+			String [] serversNames = new String[json.length()]; //Создаем архив для школ
+			servers = new String[json.length()];
 			
 			Iterator<String> inter = json.keys(); //Получаем ключи для значений в JSON'e и заносим их в Iterator
 		
 			Integer i = 0; //Создаем счетчик i
 		
 			while (inter.hasNext() == true) { //Цикл для заполнения массива школами
-				servers[i] = inter.next(); //Заполняем ячейку массива школой
+				serversNames[i] = inter.next(); //Заполняем ячейку массива школой
 				i += 1; //Увеличчиваем счетчик на 1
 			}
+			
+			for (i = 0; i < json.length(); i++) {
+				servers[i] = json.getString(serversNames[i]);
+			}
 		
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, servers); //Создаем адаптер для выпадающего списка используя массив с школами
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, serversNames); //Создаем адаптер для выпадающего списка используя массив с школами
 			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); //Продолжение
 		
 			serverSlct = (Spinner) findViewById(R.id.serverSelect); //Находим выпадающий список по id
@@ -100,7 +103,13 @@ public class LogInActivity extends ActionBarActivity {
 			e.printStackTrace();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			String[] s = {""};
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, s); //Создаем адаптер для выпадающего списка используя массив с школами
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); //Продолжение
+		
+			serverSlct = (Spinner) findViewById(R.id.serverSelect); //Находим выпадающий список по id
+		
+			serverSlct.setAdapter(adapter); //Устанавливаем адаптер для выпадающего списка
 		}
 	}
 	
@@ -126,9 +135,21 @@ public class LogInActivity extends ActionBarActivity {
 	//Отправка логина и пароля и в случае удачи переход на расписание
 	public void logIn(View v) {
 		//TODO отправка логина и пароля на сервер	
-		Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
-		startActivity(intent); //Запуск станицы с расписанием
-		finish();
+		Auth connection = new Auth();
+		connection.execute(servers[serverSlct.getSelectedItemPosition()], "1", "1", "1", etUserName.getText().toString(), etPassword.getText().toString());
+		try {
+			String result = connection.get();
+			Toast.makeText(this, result, Toast.LENGTH_LONG).show();
+			Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
+			startActivity(intent); //Запуск станицы с расписанием
+			finish();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
 	}
 	
 	//Обработка нажатия на кнопку назад
@@ -187,9 +208,77 @@ public class LogInActivity extends ActionBarActivity {
 	class Auth extends AsyncTask<String, Void, String> {
 
 		@Override
-		protected String doInBackground(String... arg0) {
+		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
-			return null;
+			
+			String passwHash = "";
+			final String MD5 = "MD5";
+			
+		    try {
+		        // Create MD5 Hash
+		        MessageDigest digest = java.security.MessageDigest
+		                .getInstance(MD5);
+		        digest.update(params[5].getBytes());
+		        byte messageDigest[] = digest.digest();
+
+		        // Create Hex String
+		        StringBuilder hexString = new StringBuilder();
+		        for (byte aMessageDigest : messageDigest) {
+		            String h = Integer.toHexString(0xFF & aMessageDigest);
+		            while (h.length() < 2)
+		                h = "0" + h;
+		            hexString.append(h);
+		        }
+		        passwHash = hexString.toString();
+
+		    } catch (NoSuchAlgorithmException e) {
+		        e.printStackTrace();
+		    }
+			
+			StringBuilder urlSb = new StringBuilder(100);
+			urlSb.append("http://195.88.220.90/v1/login/auth/?srv=");
+			urlSb.append(params[0]);
+			urlSb.append("&sid=");
+			urlSb.append(params[1]);
+			urlSb.append("&cn=");
+			urlSb.append(params[2]);
+			urlSb.append("&scid=");
+			urlSb.append(params[3]);
+			urlSb.append("&login=");
+			urlSb.append(params[4]);
+			urlSb.append("&password=");
+			urlSb.append(passwHash);
+			urlSb.append("&pwlen=");
+			urlSb.append(params[5].length());
+			
+			HttpClient client = new DefaultHttpClient(); //Создаем стандартный HTTP клиент
+			HttpGet httpGet = new HttpGet(urlSb.toString()); //Создаем Get-запрос на сервер
+			HttpResponse response; //Отвечает за ответ
+			HttpEntity entity; //Хз что это
+			InputStream ins; //Поток с пришедшими данными
+			
+			try {
+				response = client.execute(httpGet); //Получения ответа на Get-запрос
+				entity = response.getEntity(); //Хз что это
+				ins = entity.getContent(); //Получаем поток из пришедших данных
+				try {
+					String result = null; //Строка с результатом
+					BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "utf-8"), 256); //Буффер с данными из полученного потока
+					StringBuilder sb = new StringBuilder(); //Конструктор строк для получения готовой строки
+					String line = null; //Строка из буффера
+					
+					while ((line = reader.readLine()) != null)  sb.append(line); //Получаем данные из буфера и заносим их в конструктор строк
+			    	
+					result = sb.toString(); //Получаем готовую строку
+			    	ins.close(); //Закрываем поток с полученными данными
+			    	
+			    	return result;
+				} catch (Exception e) {}
+			} catch (ClientProtocolException e) { //TODO
+			} catch (IOException e) { //Ошибка когда нет соединения
+				return "";
+			}
+			return "";
 		}
 	}
 }

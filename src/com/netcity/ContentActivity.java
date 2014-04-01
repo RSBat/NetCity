@@ -25,7 +25,7 @@ public class ContentActivity extends ActionBarActivity {
 
 	private static long back_pressed;
 	
-	final static String[] mDrawerTitles = {"Расписание", "Объявления", "Оценки"};
+	final static String[] mDrawerTitles = {"Расписание", "Объявления", "Оценки", "Сменить пользователя"};
 	private DrawerLayout mDrawerLayout;
     ListView mDrawerList;
     ActionBarDrawerToggle mDrawerToggle;
@@ -72,14 +72,11 @@ public class ContentActivity extends ActionBarActivity {
         mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDrawerTitles));
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-	    fragmentManager.beginTransaction()
-	                   .replace(R.id.content_frame, Fragment.instantiate(this, ScheduleScreen.class.getName()))
-	                   .commit();
 	    
 	    screenSelected = 0;
 	    getSupportActionBar().setTitle(mDrawerTitles[screenSelected]);
+	    
+	    selectItem(screenSelected);
 	}
 
 	@Override
@@ -132,11 +129,15 @@ public class ContentActivity extends ActionBarActivity {
 	
 	private void selectItem(int position) {
 		Fragment fragment = null;
-	    // Create a new fragment and specify the planet to show based on position
+		
 		switch (position) 
 		{
 		case 0:
-			fragment = Fragment.instantiate(this, ScheduleScreen.class.getName());
+			if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4) {
+				fragment = Fragment.instantiate(this, ScheduleScreen_xLarge.class.getName());
+			} else {
+				fragment = Fragment.instantiate(this, ScheduleScreen.class.getName());
+			}
 			break;
 			
 		case 1:
