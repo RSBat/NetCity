@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -25,7 +27,7 @@ public class ContentActivity extends ActionBarActivity {
 
 	private static long back_pressed;
 	
-	final static String[] mDrawerTitles = {"Расписание", "Объявления", "Оценки", "Сменить пользователя"};
+	final static String[] mDrawerTitles = {"Расписание", "Объявления", "Оценки", "Сменить пользователя", "Выход"};
 	private DrawerLayout mDrawerLayout;
     ListView mDrawerList;
     ActionBarDrawerToggle mDrawerToggle;
@@ -147,7 +149,21 @@ public class ContentActivity extends ActionBarActivity {
 		case 2:
 			fragment = Fragment.instantiate(this, MarksScreen.class.getName());
 			break;
+			
+		case 3:
+			SharedPreferences sPref = getSharedPreferences("NetCity", MODE_PRIVATE);
+			Editor prefEd = sPref.edit();
+			prefEd.putString("token", "None");
+			prefEd.commit();
+			
+			finish();
+			break;
+			
+		case 4:
+			finish();
+			break;
 		}
+		if (position < 3) {
 	    // Insert the fragment by replacing any existing fragment
 	    FragmentManager fragmentManager = getSupportFragmentManager();
 	    fragmentManager.beginTransaction()
@@ -160,6 +176,7 @@ public class ContentActivity extends ActionBarActivity {
 	    mDrawerLayout.closeDrawer(mDrawerList);
 	    
 	    screenSelected = position;
+		}
 	}
 
 	

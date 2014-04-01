@@ -19,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -39,9 +41,6 @@ public class LogInActivity extends ActionBarActivity {
 	//Поля ввода текста
 	EditText etUserName, etPassword; //Поля ввода логина и пароля соответственно
 	
-	//Чекбоксы
-	CheckBox chbRememberMe; //Отвечает за сохранение логина и пароля между сессиями (по словам Димы это не понадобится т.к. будет одноразовая авторизация)
-	
 	//Кнопки
 	Button btnLogIn; //Отправляет логин и пароль
 	
@@ -61,10 +60,16 @@ public class LogInActivity extends ActionBarActivity {
 		//Присваеваем переменным соответствующие view
 		etUserName = (EditText) findViewById(R.id.et_userName); //Поле ввода логина
 		etPassword = (EditText) findViewById(R.id.et_password); //Поле ввода пароля
-		chbRememberMe = (CheckBox) findViewById(R.id.chb_rememberMe); //Чекбокс спрашивающий надо ли сохранять логин и пароль
 		btnLogIn = (Button) findViewById(R.id.btn_logIn); //Кнопка для отправки логина и пароля
 		
 		getServers(); //Вызов функции отвечающей за получение списка школ
+		
+		SharedPreferences sPref = getSharedPreferences("NetCity", MODE_PRIVATE);
+		if (!sPref.getString("token", "None").equals("None")) {
+			Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
+			startActivity(intent); //Запуск станицы с расписанием
+			finish();
+		}
 	}
 
 	public void getServers() { //Функция для заполнения выпадающего списка
@@ -135,20 +140,36 @@ public class LogInActivity extends ActionBarActivity {
 	//Отправка логина и пароля и в случае удачи переход на расписание
 	public void logIn(View v) {
 		//TODO отправка логина и пароля на сервер	
+		
 		Auth connection = new Auth();
 		connection.execute(servers[serverSlct.getSelectedItemPosition()], "1", "1", "1", etUserName.getText().toString(), etPassword.getText().toString());
 		try {
 			String result = connection.get();
-			Toast.makeText(this, result, Toast.LENGTH_LONG).show();
-			Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
-			startActivity(intent); //Запуск станицы с расписанием
-			finish();
+			JSONObject jsonResp = new JSONObject(result);
+			String status = jsonResp.optString("error", "ok");
+			if (status.equals("ok")) {
+				SharedPreferences sPref = getSharedPreferences("NetCity", MODE_PRIVATE);
+				Editor prefEd = sPref.edit();
+				prefEd.putString("token", jsonResp.getString("token"));
+				prefEd.commit();
+				
+				Toast.makeText(this, sPref.getString("token", "none"), Toast.LENGTH_LONG).show();
+				
+				Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
+				startActivity(intent); //Запуск станицы с расписанием
+				finish();
+			} else {
+				Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
+			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	

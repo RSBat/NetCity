@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ScheduleScreen extends Fragment {
 	
@@ -224,19 +226,21 @@ public class ScheduleScreen extends Fragment {
 
 	public void getData(){
 		Connector connection = new Connector();
-		connection.execute("http://195.88.220.90/v1/login/srv_list"); //TODO
+		connection.execute("http://195.88.220.90/v1/schedule/week_list/HTTP"); //TODO
 		try {
+			String res = connection.get();
+			Toast.makeText(getActivity(), res, Toast.LENGTH_SHORT).show();
 			json = new JSONArray("[{day = \"\u041f\u043d\";lessons = [{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 1},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 2},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 3},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 4},{name = \"\u0411\u0438\u043e\u043b\u043e\u0433\u0438\u044f\";num = 5},{name = \"\u0413\u0435\u043e\u0433\u0440\u0430\u0444\u0438\u044f\";num = 6},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"ВТ\";lessons = [{name = \"Биология\";num = 1},{name = \"Фр.яз./1гр, Фр.яз./2гр\";num = 2},{name = \"Анг.яз./1гр, Анг.яз./2гр\";num = 3},{name = \"Анг.яз./1гр, Анг.яз./2гр\";num = 4},{name = \"Химия\";num = 5},{name = \"Химия\";num = 6},{name = \"-\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"\u0421\u0440\";lessons = [{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 1},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 2},{name = \"\u041b\u0438\u0442-\u0440\u0430\";num = 3},{name = \"\u041b\u0438\u0442-\u0440\u0430\";num = 4},{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 5},{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 6},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5}]},{day = \"\u0427\u0442\";lessons = [{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 1},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 2},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 3},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6},{name = \"-\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"\u041f\u0442\";lessons = [{name = \"-\";num = 0},{name = \"\u041e\u0431\u0449\u0435\u0441\u0442.\";num = 1},{name = \"\u041e\u0431\u0449\u0435\u0441\u0442.\";num = 2},{name = \"\u0423/\u043f\u0440 \u0410\u043d\u0433.\";num = 3},{name = \"\u0423/\u043f\u0440 \u0410\u043d\u0433.\";num = 4},{name = \"\u0425\u0438\u043c\u0438\u044f\";num = 5},{name = \"\u042d\u043b./\u0410\u043d\u0433., \u042d\u043b./\u0424\u0438\u0437, \u042d\u043b./\u041e\u0431\u0449., \u042d\u043b./\u041c\u0430\u0442., \u042d\u043b./\u0418\u0441\u0442.\";num = 6},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5}]},{day = \"\u0421\u0431\";lessons = [{name = \"\u041c/\u043a\u0443\u0440\u0441\";num = 1},{name = \"\u041e\u0411\u0416\";num = 2},{name = \"\u0424\u0438\u0437\u0438\u043a\u0430\";num = 3},{name = \"\u0424\u0438\u0437\u0438\u043a\u0430\";num = 4},{name = \"\u0418\u043d\u0444\u043e\u0440.\";num = 5},{name = \"-\";num = 6}]}]");// = connection.get();
-		/*} catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();*/
+			e.printStackTrace();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 	}
 	
 	public void setBtnEnabled(Button btn) {
@@ -250,17 +254,19 @@ public class ScheduleScreen extends Fragment {
 		btn.setEnabled(false);
 	}
 	
-	class Connector extends AsyncTask<String,Void,JSONObject> {
+	class Connector extends AsyncTask<String,Void,String> {
 
 		@Override
-		protected JSONObject doInBackground(String... params) {
+		protected String doInBackground(String... params) {
 			// TODO Auto-generated method stub
+			SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
 			HttpClient client = new DefaultHttpClient();
 			HttpGet httpGet = new HttpGet(params[0]);
 			HttpResponse response;
 			HttpEntity entity;
 			InputStream ins;
 			
+			httpGet.addHeader("token", sPref.getString("token", "None"));
 			
 			try {
 				response = client.execute(httpGet);
@@ -275,13 +281,14 @@ public class ScheduleScreen extends Fragment {
 					while ((line = reader.readLine()) != null)  sb.append(line); 
 			    		result = sb.toString();
 			    	ins.close();
-			    	return new JSONObject(result);
+			    	return result;
 				} catch (Exception e) {}
-			} catch (ClientProtocolException e) { //TODO
-			} catch (IOException e) { //Ошибка когда нет соединения TODO
-				return null;
+			} catch (ClientProtocolException e) {
+				return "ClientProtocolException";
+			} catch (IOException e) { //Ошибка когда нет соединения
+				return "IOException";
 			}
-			return null;
+			return "Error";
 		}
 		
 	}
