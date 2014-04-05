@@ -83,6 +83,12 @@
 					    android:layout_height="wrap_content"
 	    				android:layout_weight="1"
 	    				android:orientation="vertical" >
+	    				
+					    <ProgressBar
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:indeterminate="true"
+					        android:layout_gravity="left" />
 					</LinearLayout>
 			
 					<LinearLayout
@@ -95,5 +101,4 @@
 			</LinearLayout>
 		</ScrollView>
 	</LinearLayout>
-	
 </LinearLayout>

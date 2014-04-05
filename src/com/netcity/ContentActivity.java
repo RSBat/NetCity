@@ -95,14 +95,6 @@ public class ContentActivity extends ActionBarActivity {
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
 	          return true;
 		}
-
-		switch (item.getItemId())
-		{
-		case R.id.action_settings:
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
-			break;
-		}
 		
 		return true;
 	}

@@ -249,7 +249,6 @@ int id action_menu_divider 0x7f060016
 int id action_menu_presenter 0x7f060017
 int id action_mode_close_button 0x7f060024
 int id action_refresh 0x7f06005e
-int id action_settings 0x7f060060
 int id activity_chooser_view_content 0x7f060025
 int id always 0x7f06000b
 int id beginning 0x7f060011

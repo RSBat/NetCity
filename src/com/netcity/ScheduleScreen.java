@@ -23,21 +23,41 @@ import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
+/**
+ * 
+ * @author Сергей
+ * 
+ */
 public class ScheduleScreen extends Fragment {
 	
 	//Описание переменных
+	/**
+	 * Левая часть экрана для расписания.
+	 * <p>В portrait режиме используется для вывода всего расписания <br/> 
+	 * В landscape режиме используется для вывода расписания первой смены</p>
+	 */
+	LinearLayout llSchedule1;
 	
-	LinearLayout llSchedule1, llSchedule2;
+	/**
+	 * Правая часть экрана для расписания.
+	 * <p>В portrait режиме не используется <br/>
+	 * В landscape режиме используется для вывода расписания второй смены</p>
+	 */
+	LinearLayout llSchedule2;
 	
+	/**
+	 * 
+	 */
 	TextView tvDayOfWeek;
 	
 	//Массивы строк
@@ -52,7 +72,15 @@ public class ScheduleScreen extends Fragment {
 	
 	int day = 0;
 	
-	//Вызывается при создании активити
+	/**
+	 * <p><b>Главный метод</b></p>
+	 * <p>1) Создает View из .xml файла. <br/>
+	 * 2) Находит нужные нам View <br/>
+	 * 3) Задает кнопкам обработчик нажатия который изменяет значение глобальной переменной (int) day на соответствующее выбранному дню <br/>
+	 * 4) Определяем сегодняшний день и заносим его в глобальную переменную (int) day <br/>
+	 * 5) В зависимости от дня недели выключаем соответствующую кнопку <br/>
+	 * 6) Создаем поток в котором получаем расписание и выводим его на экран</p> 
+	 */
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.schedule_screen, null);
 		
@@ -112,7 +140,7 @@ public class ScheduleScreen extends Fragment {
 		btnFriday.setOnClickListener(onCl);
 		btnSaturday.setOnClickListener(onCl);
 		
-		getData(); //Вызываем функцию получения данных
+		//getData(); //Вызываем функцию получения данных
 		
 		day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2;
 		
@@ -147,12 +175,17 @@ public class ScheduleScreen extends Fragment {
 			break;
 		}
 		
-		showSchedule();
+		Connector connection = new Connector();
+		connection.execute();
 		
 		return v;
 	}
 	
 	//Функция вывода расписания на экран
+	/**
+	 * <p><b>Функция показа расписания</b></p>
+	 * <p>Получает день недели из глобальной переменной (int) day и заполняет экран данными из глобального (JSONArray) json</p>
+	 */
 	public void showSchedule() {
 		//TODO вывод расписания на экран
 		llSchedule1.removeAllViews();
@@ -224,13 +257,19 @@ public class ScheduleScreen extends Fragment {
 		}
 	}
 
-	public void getData(){
+	/**
+	 * <p><b>Функция получения расписания с сервера</b></p>
+	 * <p>Получает день недели из глобальной переменной (int) day и заполняет экран данными из глобального (JSONArray) json</p>
+	 */
+	/*public void getData(){
 		Connector connection = new Connector();
-		connection.execute("http://195.88.220.90/v1/schedule/week_list/HTTP"); //TODO
+		connection.execute(); //TODO
 		try {
 			String res = connection.get();
-			Toast.makeText(getActivity(), res, Toast.LENGTH_SHORT).show();
-			json = new JSONArray("[{day = \"\u041f\u043d\";lessons = [{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 1},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 2},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 3},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 4},{name = \"\u0411\u0438\u043e\u043b\u043e\u0433\u0438\u044f\";num = 5},{name = \"\u0413\u0435\u043e\u0433\u0440\u0430\u0444\u0438\u044f\";num = 6},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"ВТ\";lessons = [{name = \"Биология\";num = 1},{name = \"Фр.яз./1гр, Фр.яз./2гр\";num = 2},{name = \"Анг.яз./1гр, Анг.яз./2гр\";num = 3},{name = \"Анг.яз./1гр, Анг.яз./2гр\";num = 4},{name = \"Химия\";num = 5},{name = \"Химия\";num = 6},{name = \"-\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"\u0421\u0440\";lessons = [{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 1},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 2},{name = \"\u041b\u0438\u0442-\u0440\u0430\";num = 3},{name = \"\u041b\u0438\u0442-\u0440\u0430\";num = 4},{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 5},{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 6},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5}]},{day = \"\u0427\u0442\";lessons = [{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 1},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 2},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 3},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6},{name = \"-\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"\u041f\u0442\";lessons = [{name = \"-\";num = 0},{name = \"\u041e\u0431\u0449\u0435\u0441\u0442.\";num = 1},{name = \"\u041e\u0431\u0449\u0435\u0441\u0442.\";num = 2},{name = \"\u0423/\u043f\u0440 \u0410\u043d\u0433.\";num = 3},{name = \"\u0423/\u043f\u0440 \u0410\u043d\u0433.\";num = 4},{name = \"\u0425\u0438\u043c\u0438\u044f\";num = 5},{name = \"\u042d\u043b./\u0410\u043d\u0433., \u042d\u043b./\u0424\u0438\u0437, \u042d\u043b./\u041e\u0431\u0449., \u042d\u043b./\u041c\u0430\u0442., \u042d\u043b./\u0418\u0441\u0442.\";num = 6},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5}]},{day = \"\u0421\u0431\";lessons = [{name = \"\u041c/\u043a\u0443\u0440\u0441\";num = 1},{name = \"\u041e\u0411\u0416\";num = 2},{name = \"\u0424\u0438\u0437\u0438\u043a\u0430\";num = 3},{name = \"\u0424\u0438\u0437\u0438\u043a\u0430\";num = 4},{name = \"\u0418\u043d\u0444\u043e\u0440.\";num = 5},{name = \"-\";num = 6}]}]");// = connection.get();
+			//Toast.makeText(getActivity(), res, Toast.LENGTH_SHORT).show();
+			Log.w("MYLOG", res);
+			json = new JSONArray(res);
+			showSchedule();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -241,8 +280,13 @@ public class ScheduleScreen extends Fragment {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	} */
 	
+	/**
+	 * <p><b>Выключение кнопки</b></p>
+	 * <p>Выключает нужную кнопку выбора дня при этом включая все остальные</p>
+	 * @param btn Кнопка которую надо выключить
+	 */
 	public void setBtnEnabled(Button btn) {
 		btnMonday.setEnabled(true);
 		btnTuesday.setEnabled(true);
@@ -254,19 +298,21 @@ public class ScheduleScreen extends Fragment {
 		btn.setEnabled(false);
 	}
 	
-	class Connector extends AsyncTask<String,Void,String> {
-
+	class Connector extends AsyncTask<Void,Void,String> {
+		
 		@Override
-		protected String doInBackground(String... params) {
+		protected String doInBackground(Void... arg0) {
 			// TODO Auto-generated method stub
 			SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
 			HttpClient client = new DefaultHttpClient();
-			HttpGet httpGet = new HttpGet(params[0]);
+			HttpGet httpGet = new HttpGet("http://195.88.220.90/v1/schedule/week");
 			HttpResponse response;
 			HttpEntity entity;
 			InputStream ins;
 			
-			httpGet.addHeader("token", sPref.getString("token", "None"));
+			Log.w("MYLOG", sPref.getString("token", "None"));
+			
+			httpGet.setHeader("Auth-Token", sPref.getString("token", "None"));
 			
 			try {
 				response = client.execute(httpGet);
@@ -281,6 +327,7 @@ public class ScheduleScreen extends Fragment {
 					while ((line = reader.readLine()) != null)  sb.append(line); 
 			    		result = sb.toString();
 			    	ins.close();
+			    	
 			    	return result;
 				} catch (Exception e) {}
 			} catch (ClientProtocolException e) {
@@ -291,6 +338,18 @@ public class ScheduleScreen extends Fragment {
 			return "Error";
 		}
 		
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+
+	    	try {
+				json = new JSONArray(result);
+				showSchedule();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }
 

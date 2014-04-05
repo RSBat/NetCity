@@ -7,15 +7,4 @@
         android:icon="@drawable/ic_action_refresh"
         android:title="@string/action_refresh"
         myApp:showAsAction="always" />
-    
-    <item
-        android:id="@+id/action_logOut"
-        android:title="@string/action_logOut"
-        myApp:showAsAction="never" />
-    
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/ic_action_settings"
-        android:title="@string/action_settings"
-        myApp:showAsAction="ifRoom" />"
 </menu>

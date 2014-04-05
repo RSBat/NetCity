@@ -1007,7 +1007,6 @@ containing a value of this type.
         public static final int action_menu_presenter=0x7f060017;
         public static final int action_mode_close_button=0x7f060024;
         public static final int action_refresh=0x7f06005e;
-        public static final int action_settings=0x7f060060;
         public static final int activity_chooser_view_content=0x7f060025;
         public static final int always=0x7f06000b;
         public static final int beginning=0x7f060011;
