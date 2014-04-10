@@ -67,38 +67,50 @@
 		    android:textSize="24sp"
 		  	android:gravity="center" />
 		
+		<TextView
+		    android:id="@+id/tv_day"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:textSize="12sp"
+		    android:gravity="center" />
+		
 		<ScrollView
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content" >
 			
 			<LinearLayout
+			    android:id="@+id/ll_schedule"
 		    	android:layout_width="match_parent"
 		    	android:layout_height="wrap_content"
 		    	android:layout_marginTop="5dp"
+		    	android:weightSum="2"
 		    	android:orientation="horizontal" >
-	    		
-					<LinearLayout
-	    				android:id="@+id/ll_schedule_1"
-	    				android:layout_width="0dp"
-					    android:layout_height="wrap_content"
-	    				android:layout_weight="1"
-	    				android:orientation="vertical" >
-	    				
-					    <ProgressBar
-					        android:layout_width="wrap_content"
-					        android:layout_height="wrap_content"
-					        android:indeterminate="true"
-					        android:layout_gravity="left" />
-					</LinearLayout>
-			
-					<LinearLayout
-	   					android:id="@+id/ll_schedule_2"
-	    				android:layout_width="0dp"
-	    				android:layout_height="wrap_content"
-	    				android:layout_weight="1"
-	    				android:orientation="vertical" >
-	    		</LinearLayout>
+		    	
+			    <ProgressBar
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center" />
 			</LinearLayout>
 		</ScrollView>
+		
+		<LinearLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal" >
+		    
+		    <Button
+		        android:id="@+id/btn_prevWeek"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:text="Предыдущая неделя" />
+		    
+		    <Button
+		        android:id="@+id/btn_nextWeek"
+		        android:layout_width="0dp"
+		        android:layout_height="wrap_content"
+		        android:layout_weight="1"
+		        android:text="Следующая неделя" />
+		</LinearLayout>
 	</LinearLayout>
 </LinearLayout>

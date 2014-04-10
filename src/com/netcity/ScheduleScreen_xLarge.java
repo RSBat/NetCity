@@ -16,8 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.netcity.ScheduleScreen.Connector;
-
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
