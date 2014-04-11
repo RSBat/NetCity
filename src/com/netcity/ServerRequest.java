@@ -27,7 +27,7 @@ import android.util.Log;
  * 
  * @author Сергей
  */
-public class ServerRequest extends AsyncTask<String, Void, String> {
+public class ServerRequest {
 
 	/**
 	 * @param 1 url по которому надо отправить запрос
@@ -35,8 +35,7 @@ public class ServerRequest extends AsyncTask<String, Void, String> {
 	 * @param 3 надо ли отправлить ключ авторизации true/false
 	 * @param 4 ключ авторизации
 	 */
-	@Override
-	protected String doInBackground(String... params) {
+	protected String connect(String... params) {
 		HttpClient client = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(params[0] + params[1]);
 		HttpResponse response;

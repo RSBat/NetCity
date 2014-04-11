@@ -4,7 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,46 +20,70 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.netcity.ScheduleScreen.ChangeWeek;
+import com.netcity.ScheduleScreen.GetSchedule;
+
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.LinearLayout.LayoutParams;
 
+/**
+ * 
+ * @author Сергей
+ *
+ */
 public class ScheduleScreen_xLarge extends Fragment {
 
+	LinearLayout llSchedule;
+	
+	TextView tvDayOfWeek1, tvDayOfWeek2;
+	TextView tvDate1, tvDate2;
+	
 	String[] days = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
 	
+	JSONArray json;
+	JSONArray jsonWeeks;
+	
 	Button btnMondayTuesday, btnWednesdayThursday, btnFridaySaturday;
-	
-	LinearLayout llSchedule1, llSchedule2;
-	
-	TextView tvDay1, tvDay2;
-	
-	JSONArray json = null;
+	Button btnWeekNext, btnWeekPrev;
 	
 	int day;
+	int weekNum = 0;
+	String week = "";
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.schedule_screen_xlarge, null);
+		
+		GetSchedule getSchedule = new GetSchedule();
+		getSchedule.execute();
 		
 		btnMondayTuesday = (Button) v.findViewById(R.id.btn_monday_tuesday);
 		btnWednesdayThursday = (Button) v.findViewById(R.id.btn_wednesday_thursday);
 		btnFridaySaturday = (Button) v.findViewById(R.id.btn_friday_saturday);
 		
-		tvDay1 = (TextView) v.findViewById(R.id.tv_dayOfWeek1);
-		tvDay2 = (TextView) v.findViewById(R.id.tv_dayOfWeek2);
+		tvDayOfWeek1 = (TextView) v.findViewById(R.id.tv_dayOfWeek1);
+		tvDayOfWeek2 = (TextView) v.findViewById(R.id.tv_dayOfWeek2);
 		
-		llSchedule1 = (LinearLayout) v.findViewById(R.id.ll_schedule_xlarge_1);
-		llSchedule2 = (LinearLayout) v.findViewById(R.id.ll_schedule_xlarge_2);
+		tvDate1 = (TextView) v.findViewById(R.id.tv_date1);
+		tvDate2 = (TextView) v.findViewById(R.id.tv_date2);
 		
+		llSchedule = (LinearLayout) v.findViewById(R.id.ll_schedule);
 		
+		btnWeekNext = (Button) v.findViewById(R.id.btn_nextWeek);
+		btnWeekPrev = (Button) v.findViewById(R.id.btn_prevWeek);
 		
 		OnClickListener onCl = new OnClickListener() {
 
@@ -86,6 +114,28 @@ public class ScheduleScreen_xLarge extends Fragment {
 		btnWednesdayThursday.setOnClickListener(onCl);
 		btnFridaySaturday.setOnClickListener(onCl);
 		
+		btnWeekNext.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				ChangeWeek gCh = new ChangeWeek();
+				gCh.execute(1);
+			}		
+		});
+		
+		btnWeekPrev.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				ChangeWeek gCh = new ChangeWeek();
+				gCh.execute(0);
+			}
+			
+		});
+		
+		
 		day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2;
 		
 		if (day == -1) {
@@ -110,25 +160,44 @@ public class ScheduleScreen_xLarge extends Fragment {
 			break;
 		}
 		
-		getData();
-		
-		showSchedule();
-		
 		return v;
 	}
 
 	private void showSchedule() {
-		llSchedule1.removeAllViews();
-		llSchedule2.removeAllViews();
+		llSchedule.removeAllViews();
+		
+		// Берем дату понедельника этой недели переводим в Calendar изменяем на нужный день недели и выводим строкой
+		SimpleDateFormat  dateFormat = new SimpleDateFormat("dd.MM.yy");    
+				
+		try {
+			Date dateMonday = (Date) dateFormat.parse(week);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(dateMonday);
+			cal.add(Calendar.DAY_OF_WEEK, day);
+			tvDate1.setText(dateFormat.format(cal.getTime()));
+			cal.add(Calendar.DAY_OF_WEEK, 1);
+			tvDate2.setText(dateFormat.format(cal.getTime()));
+		} catch (ParseException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 			
 			JSONObject jsonDay;
 			try {
+				LayoutParams llPar = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1);
+				LinearLayout llSchedule1 = new LinearLayout(getActivity());
+				LinearLayout llSchedule2 = new LinearLayout(getActivity());
+				llSchedule1.setOrientation(1);
+				llSchedule2.setOrientation(1);
+				llSchedule1.setLayoutParams(llPar);
+				llSchedule2.setLayoutParams(llPar);
+				
 				jsonDay = json.getJSONObject(day);
 				JSONArray jsonLessons = jsonDay.getJSONArray("lessons");
 			
-				tvDay1.setText(days[day]);
+				tvDayOfWeek1.setText(days[day]);
 			
 				for (int i = 0; i < jsonLessons.length(); i += 1) {
 					
@@ -149,7 +218,7 @@ public class ScheduleScreen_xLarge extends Fragment {
 				jsonDay = json.getJSONObject(day+1);
 				jsonLessons = jsonDay.getJSONArray("lessons");
 				
-				tvDay2.setText(days[day + 1]);
+				tvDayOfWeek2.setText(days[day + 1]);
 			
 				for (int i = 0; i < 10; i += 1) {
 					
@@ -166,19 +235,28 @@ public class ScheduleScreen_xLarge extends Fragment {
 						//e.printStackTrace();
 					}
 				}
+				
+				llSchedule.addView(llSchedule1);
+				llSchedule.addView(llSchedule2);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
 			}
 		} else {
-			
-
 			JSONObject jsonDay;
 			try {
+				LayoutParams llPar = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1);
+				LinearLayout llSchedule1 = new LinearLayout(getActivity());
+				LinearLayout llSchedule2 = new LinearLayout(getActivity());
+				llSchedule1.setOrientation(1);
+				llSchedule2.setOrientation(1);
+				llSchedule1.setLayoutParams(llPar);
+				llSchedule2.setLayoutParams(llPar);
+				
 				jsonDay = json.getJSONObject(day);
 				JSONArray jsonLessons = jsonDay.getJSONArray("lessons");
 				
-				tvDay1.setText(days[day]);
+				tvDayOfWeek1.setText(days[day]);
 			
 				for (int i = 0; i < jsonLessons.length(); i += 1) {
 					JSONObject jsonLes;
@@ -198,7 +276,7 @@ public class ScheduleScreen_xLarge extends Fragment {
 				jsonDay = json.getJSONObject(day+1);
 				jsonLessons = jsonDay.getJSONArray("lessons");
 			
-				tvDay2.setText(days[day + 1]);
+				tvDayOfWeek2.setText(days[day + 1]);
 			
 				for (int i = 0; i < jsonLessons.length(); i += 1) {
 					JSONObject jsonLes;
@@ -214,6 +292,9 @@ public class ScheduleScreen_xLarge extends Fragment {
 						//e.printStackTrace();
 					}
 				}
+				
+				llSchedule.addView(llSchedule1);
+				llSchedule.addView(llSchedule2);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
@@ -228,56 +309,153 @@ public class ScheduleScreen_xLarge extends Fragment {
 		btn.setEnabled(false);
 	}
 	
-	public void getData(){
-		Connector connection = new Connector();
-		connection.execute("http://195.88.220.90/v1/login/srv_list"); //TODO
-		try {
-			json = new JSONArray("[{day = \"\u041f\u043d\";lessons = [{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 1},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 2},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 3},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 4},{name = \"\u0411\u0438\u043e\u043b\u043e\u0433\u0438\u044f\";num = 5},{name = \"\u0413\u0435\u043e\u0433\u0440\u0430\u0444\u0438\u044f\";num = 6},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"\u0412\u0442\";lessons = [{name = \"\u0418\u043d.\u044f\u0437./\u042f\u043f.\";num = 1},{name = \"\u0418\u043d.\u044f\u0437./\u042f\u043f.\";num = 2},{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 3},{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 4},{name = \"\u0420\u0443\u0441.\u044f\u0437.\";num = 5},{name = \"\u041b\u0438\u0442-\u0440\u0430\";num = 6},{name = \"-\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"\u0421\u0440\";lessons = [{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 1},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 2},{name = \"\u041b\u0438\u0442-\u0440\u0430\";num = 3},{name = \"\u041b\u0438\u0442-\u0440\u0430\";num = 4},{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 5},{name = \"\u041c\u0430\u0442\u0435\u043c.\";num = 6},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5}]},{day = \"\u0427\u0442\";lessons = [{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 1},{name = \"\u0424\u0438\u0437-\u0440\u0430\";num = 2},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 3},{name = \"\u0410\u043d\u0433.\u044f\u0437.\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6},{name = \"-\";num = 7},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5},{name = \"-\";num = 6}]},{day = \"\u041f\u0442\";lessons = [{name = \"-\";num = 0},{name = \"\u041e\u0431\u0449\u0435\u0441\u0442.\";num = 1},{name = \"\u041e\u0431\u0449\u0435\u0441\u0442.\";num = 2},{name = \"\u0423/\u043f\u0440 \u0410\u043d\u0433.\";num = 3},{name = \"\u0423/\u043f\u0440 \u0410\u043d\u0433.\";num = 4},{name = \"\u0425\u0438\u043c\u0438\u044f\";num = 5},{name = \"\u042d\u043b./\u0410\u043d\u0433., \u042d\u043b./\u0424\u0438\u0437, \u042d\u043b./\u041e\u0431\u0449., \u042d\u043b./\u041c\u0430\u0442., \u042d\u043b./\u0418\u0441\u0442.\";num = 6},{name = \"-\";num = 1},{name = \"-\";num = 2},{name = \"-\";num = 3},{name = \"-\";num = 4},{name = \"-\";num = 5}]},{day = \"\u0421\u0431\";lessons = [{name = \"\u041c/\u043a\u0443\u0440\u0441\";num = 1},{name = \"\u041e\u0411\u0416\";num = 2},{name = \"\u0424\u0438\u0437\u0438\u043a\u0430\";num = 3},{name = \"\u0424\u0438\u0437\u0438\u043a\u0430\";num = 4},{name = \"\u0418\u043d\u0444\u043e\u0440.\";num = 5},{name = \"-\";num = 6}]}]");// = connection.get();
-		/*} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();*/
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-	}
-	
-	class Connector extends AsyncTask<String,Void,JSONObject> {
-
-		@Override
-		protected JSONObject doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			HttpClient client = new DefaultHttpClient();
-			HttpGet httpGet = new HttpGet(params[0]);
-			HttpResponse response;
-			HttpEntity entity;
-			InputStream ins;
+class GetSchedule extends AsyncTask<Void,Void,String> {
+		ServerRequest sReqSchedule = new ServerRequest();
+		ServerRequest sReqWeeks = new ServerRequest();
+		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
+		
+		protected void onPreExecute() {
 			
 			
-			try {
-				response = client.execute(httpGet);
-				entity = response.getEntity();
-				ins = entity.getContent();
-				try {
-					String result;
-					BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "utf-8"), 256);
-					StringBuilder sb = new StringBuilder();
-					String line = null;
-					
-					while ((line = reader.readLine()) != null)  sb.append(line); 
-			    		result = sb.toString();
-			    	ins.close();
-			    	return new JSONObject(result);
-				} catch (Exception e) {}
-			} catch (ClientProtocolException e) { //TODO
-			} catch (IOException e) { //Ошибка когда нет соединения TODO
-				return null;
-			}
-			return null;
 		}
 		
+		@Override
+		protected String doInBackground(Void... arg0) {
+			// TODO Auto-generated method stub
+			
+			Log.w("MYLOG", "Started");
+			
+			try {				
+				jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", "true", sPref.getString("token", "None")));
+				
+				Log.w("MYLOG", "Req successful");
+				
+				for (int i = 0; i < jsonWeeks.length(); i++) {
+					if (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2 == -1) {
+						Calendar tomorrow = Calendar.getInstance();
+						tomorrow.add(Calendar.DAY_OF_WEEK, 1);
+						
+						Date dateTomorrow = tomorrow.getTime();
+						
+						SimpleDateFormat  dateFormat = new SimpleDateFormat("dd.MM.yy");    
+						
+						String strTomorrow = dateFormat.format(dateTomorrow);
+						
+						
+						if (((String) (jsonWeeks.getJSONObject(i).keys().next())).equals(strTomorrow)) {
+							weekNum = i+1;
+							week = (String) jsonWeeks.getJSONObject(i).keys().next();
+							Log.w("MYLOG", week);
+						}
+					} else {
+						Calendar monday = Calendar.getInstance();
+						monday.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+						
+						Date dateMonday = monday.getTime();
+						
+						SimpleDateFormat  dateFormat = new SimpleDateFormat("dd.MM.yy");    
+						
+						String strMonday = dateFormat.format(dateMonday);
+						StringBuilder sbMonday = new StringBuilder(strMonday);
+						if (sbMonday.charAt(0) == '0') {
+							sbMonday.deleteCharAt(0);
+						}
+						strMonday = sbMonday.toString();
+						
+						Log.w("MYLOG", "----------");
+						Log.w("MYLOG", i + "");
+						Log.w("MYLOG", strMonday);
+						Log.w("MYLOG", (String) (jsonWeeks.getJSONObject(i).keys().next()));
+						
+						if (((String) (jsonWeeks.getJSONObject(i).keys().next())).equals(strMonday)) {
+							weekNum = i+1;
+							week = (String) jsonWeeks.getJSONObject(i).keys().next();
+							Log.w("MYLOG", "week" + week);
+							break;
+						}
+					}
+				}
+				
+				
+				json = new JSONArray(sReqSchedule.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None")));
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return "OK";
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			
+			try {
+				if (json.getJSONObject(0).optString("error", "None").equals("None")) {
+					showSchedule();
+				} else {
+					Toast.makeText(getActivity(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
+	class ChangeWeek extends AsyncTask<Integer, Void, String> {
+
+		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
+		ServerRequest sReq = new ServerRequest();
+		
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+			
+			
+			llSchedule.removeAllViews();
+			
+			ProgressBar prbar = new ProgressBar(getActivity());
+			
+			llSchedule.addView(prbar);
+		}
+		
+		@Override
+		protected String doInBackground(Integer... params) { //0 - пред неделя 1 - след неделя
+			if (params[0] == 0) {
+				weekNum -=1;
+			} else if (params[0] == 1) {
+				weekNum += 1;
+			}
+			
+			try {
+				week = (String) jsonWeeks.getJSONObject(weekNum-1).keys().next();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			String result = null;
+			
+			result = sReq.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None"));
+			
+			return result;
+		}
+		
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+			
+			try {
+				json = new JSONArray(result);
+				showSchedule();
+				Toast.makeText(getActivity(), week, Toast.LENGTH_SHORT).show();
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }

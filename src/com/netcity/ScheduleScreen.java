@@ -25,6 +25,7 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 /**
  * 
  * @author Сергей
@@ -63,6 +64,9 @@ public class ScheduleScreen extends Fragment {
 	 */
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.schedule_screen, null);
+		
+		GetSchedule getSchedule = new GetSchedule();
+		getSchedule.execute();
 		
 		llSchedule = (LinearLayout) v.findViewById(R.id.ll_schedule);
 		
@@ -177,9 +181,6 @@ public class ScheduleScreen extends Fragment {
 			break;
 		}
 		
-		GetSchedule getSchedule = new GetSchedule();
-		getSchedule.execute();
-		
 		return v;
 	}
 	
@@ -230,6 +231,7 @@ public class ScheduleScreen extends Fragment {
 						//e.printStackTrace();
 					}
 				}
+				
 				llSchedule.addView(llSchedule1);
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
@@ -303,19 +305,19 @@ public class ScheduleScreen extends Fragment {
 	}
 	
 	class GetSchedule extends AsyncTask<Void,Void,String> {
+		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
+			
+		ServerRequest sReqSchedule = new ServerRequest();
+		ServerRequest sReqWeeks = new ServerRequest();
+			
+		
 		
 		@Override
 		protected String doInBackground(Void... arg0) {
 			// TODO Auto-generated method stub
-			SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
-			
-			ServerRequest sReqSchedule = new ServerRequest();
-			ServerRequest sReqWeeks = new ServerRequest();
-			
-			sReqWeeks.execute("http://195.88.220.90/v1/schedule/week_list", "", "true", sPref.getString("token", "None"));
 			
 			try {				
-				jsonWeeks = new JSONArray(sReqWeeks.get());
+				jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", "true", sPref.getString("token", "None")));
 				
 				for (int i = 0; i < jsonWeeks.length(); i++) {
 					if (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2 == -1) {
@@ -363,15 +365,8 @@ public class ScheduleScreen extends Fragment {
 					}
 				}
 				
-				sReqSchedule.execute("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None"));
-				json = new JSONArray(sReqSchedule.get());
+				json = new JSONArray(sReqSchedule.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None")));
 				
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -403,6 +398,8 @@ public class ScheduleScreen extends Fragment {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			
+			
+			
 			llSchedule.removeAllViews();
 			
 			ProgressBar prbar = new ProgressBar(getActivity());
@@ -427,17 +424,8 @@ public class ScheduleScreen extends Fragment {
 			
 			SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
 			ServerRequest sReq = new ServerRequest();
-			sReq.execute("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None"));
-			String result = null;
-			try {
-				result = sReq.get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
+			String result = sReq.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None"));
 			
 			return result;
 		}

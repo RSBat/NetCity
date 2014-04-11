@@ -1045,8 +1045,6 @@ containing a value of this type.
         public static final int listMode=0x7f060001;
         public static final int list_item=0x7f060029;
         public static final int ll_schedule=0x7f060056;
-        public static final int ll_schedule_xlarge_1=0x7f06005d;
-        public static final int ll_schedule_xlarge_2=0x7f06005f;
         public static final int ll_spinner=0x7f060041;
         public static final int middle=0x7f060012;
         public static final int never=0x7f060009;
@@ -1082,6 +1080,8 @@ containing a value of this type.
         public static final int tr_month2=0x7f060047;
         public static final int tr_month3=0x7f060049;
         public static final int tv_date=0x7f060055;
+        public static final int tv_date1=0x7f06005d;
+        public static final int tv_date2=0x7f06005f;
         public static final int tv_dayOfWeek=0x7f060054;
         public static final int tv_dayOfWeek1=0x7f06005c;
         public static final int tv_dayOfWeek2=0x7f06005e;
