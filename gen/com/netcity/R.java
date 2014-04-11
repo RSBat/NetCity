@@ -1015,8 +1015,8 @@ containing a value of this type.
         public static final int btn_logIn=0x7f060043;
         public static final int btn_monday=0x7f06004e;
         public static final int btn_monday_tuesday=0x7f060059;
-        public static final int btn_nextWeek=0x7f060057;
-        public static final int btn_prevWeek=0x7f060058;
+        public static final int btn_nextWeek=0x7f060058;
+        public static final int btn_prevWeek=0x7f060057;
         public static final int btn_saturday=0x7f060053;
         public static final int btn_thursday=0x7f060051;
         public static final int btn_tuesday=0x7f06004f;
@@ -1081,7 +1081,7 @@ containing a value of this type.
         public static final int tr_month1=0x7f060045;
         public static final int tr_month2=0x7f060047;
         public static final int tr_month3=0x7f060049;
-        public static final int tv_day=0x7f060055;
+        public static final int tv_date=0x7f060055;
         public static final int tv_dayOfWeek=0x7f060054;
         public static final int tv_dayOfWeek1=0x7f06005c;
         public static final int tv_dayOfWeek2=0x7f06005e;

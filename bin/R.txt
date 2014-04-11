@@ -257,8 +257,8 @@ int id btn_friday_saturday 0x7f06005b
 int id btn_logIn 0x7f060043
 int id btn_monday 0x7f06004e
 int id btn_monday_tuesday 0x7f060059
-int id btn_nextWeek 0x7f060057
-int id btn_prevWeek 0x7f060058
+int id btn_nextWeek 0x7f060058
+int id btn_prevWeek 0x7f060057
 int id btn_saturday 0x7f060053
 int id btn_thursday 0x7f060051
 int id btn_tuesday 0x7f06004f
@@ -323,7 +323,7 @@ int id top_action_bar 0x7f060020
 int id tr_month1 0x7f060045
 int id tr_month2 0x7f060047
 int id tr_month3 0x7f060049
-int id tv_day 0x7f060055
+int id tv_date 0x7f060055
 int id tv_dayOfWeek 0x7f060054
 int id tv_dayOfWeek1 0x7f06005c
 int id tv_dayOfWeek2 0x7f06005e

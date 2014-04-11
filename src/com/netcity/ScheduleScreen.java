@@ -1,28 +1,15 @@
 package com.netcity;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
-import java.lang.Character;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -49,7 +36,7 @@ public class ScheduleScreen extends Fragment {
 	
 	LinearLayout llSchedule;
 	
-	TextView tvDayOfWeek;
+	TextView tvDayOfWeek, tvDate;
 	
 	//Массивы строк
 	String[] days = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"}; //Дни недели
@@ -80,6 +67,7 @@ public class ScheduleScreen extends Fragment {
 		llSchedule = (LinearLayout) v.findViewById(R.id.ll_schedule);
 		
 		tvDayOfWeek = (TextView) v.findViewById(R.id.tv_dayOfWeek);
+		tvDate = (TextView) v.findViewById(R.id.tv_date);
 		
 		btnMonday = (Button) v.findViewById(R.id.btn_monday);
 		btnTuesday = (Button) v.findViewById(R.id.btn_tuesday);
@@ -142,9 +130,7 @@ public class ScheduleScreen extends Fragment {
 				// TODO Auto-generated method stub
 				ChangeWeek gCh = new ChangeWeek();
 				gCh.execute(1);
-				Toast.makeText(getActivity(), "working", Toast.LENGTH_SHORT).show();
-			}
-			
+			}		
 		});
 		
 		btnWeekPrev.setOnClickListener(new OnClickListener() {
@@ -154,7 +140,6 @@ public class ScheduleScreen extends Fragment {
 				// TODO Auto-generated method stub
 				ChangeWeek gCh = new ChangeWeek();
 				gCh.execute(0);
-				Toast.makeText(getActivity(), "working", Toast.LENGTH_SHORT).show();
 			}
 			
 		});
@@ -206,8 +191,19 @@ public class ScheduleScreen extends Fragment {
 		//TODO вывод расписания на экран
 		llSchedule.removeAllViews();
 		
-		//LinearLayout llSchedule1 = new LinearLayout(getActivity());
-		//LinearLayout llSchedule2 = new LinearLayout(getActivity());
+		// Берем дату понедельника этой недели переводим в Calendar изменяем на нужный день недели и выводим строкой
+		SimpleDateFormat  dateFormat = new SimpleDateFormat("dd.MM.yy");    
+		
+		try {
+			Date dateMonday = (Date) dateFormat.parse(week);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(dateMonday);
+			cal.add(Calendar.DAY_OF_WEEK, day);
+			tvDate.setText(dateFormat.format(cal.getTime()));
+		} catch (ParseException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		
 		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {	
 			JSONObject jsonDay;
@@ -243,7 +239,7 @@ public class ScheduleScreen extends Fragment {
 		} else {
 			JSONObject jsonDay;
 			try {
-				LayoutParams llPar = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1);
+				LayoutParams llPar = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1);
 				LinearLayout llSchedule1 = new LinearLayout(getActivity());
 				LinearLayout llSchedule2 = new LinearLayout(getActivity());
 				llSchedule1.setOrientation(1);
@@ -404,10 +400,21 @@ public class ScheduleScreen extends Fragment {
 	class ChangeWeek extends AsyncTask<Integer, Void, String> {
 
 		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+			llSchedule.removeAllViews();
+			
+			ProgressBar prbar = new ProgressBar(getActivity());
+			
+			llSchedule.addView(prbar);
+		}
+		
+		@Override
 		protected String doInBackground(Integer... params) { //0 - пред неделя 1 - след неделя
-			if (params[0] == 1) {
+			if (params[0] == 0) {
 				weekNum -=1;
-			} else if (params[0] == 0) {
+			} else if (params[0] == 1) {
 				weekNum += 1;
 			}
 			
