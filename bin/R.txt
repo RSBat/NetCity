@@ -244,7 +244,8 @@ int id action_bar_root 0x7f06001a
 int id action_bar_subtitle 0x7f060023
 int id action_bar_title 0x7f060022
 int id action_context_bar 0x7f06001d
-int id action_logOut 0x7f060061
+int id action_enterToken 0x7f060061
+int id action_logOut 0x7f060062
 int id action_menu_divider 0x7f060016
 int id action_menu_presenter 0x7f060017
 int id action_mode_close_button 0x7f060024

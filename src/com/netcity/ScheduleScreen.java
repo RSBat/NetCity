@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -310,14 +311,12 @@ public class ScheduleScreen extends Fragment {
 		ServerRequest sReqSchedule = new ServerRequest();
 		ServerRequest sReqWeeks = new ServerRequest();
 			
-		
-		
 		@Override
 		protected String doInBackground(Void... arg0) {
 			// TODO Auto-generated method stub
 			
 			try {				
-				jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", "true", sPref.getString("token", "None")));
+				jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", true, sPref.getString("token", "None")));
 				
 				for (int i = 0; i < jsonWeeks.length(); i++) {
 					if (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2 == -1) {
@@ -365,7 +364,7 @@ public class ScheduleScreen extends Fragment {
 					}
 				}
 				
-				json = new JSONArray(sReqSchedule.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None")));
+				json = new JSONArray(sReqSchedule.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, true, sPref.getString("token", "None")));
 				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -398,8 +397,6 @@ public class ScheduleScreen extends Fragment {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			
-			
-			
 			llSchedule.removeAllViews();
 			
 			ProgressBar prbar = new ProgressBar(getActivity());
@@ -425,7 +422,7 @@ public class ScheduleScreen extends Fragment {
 			SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
 			ServerRequest sReq = new ServerRequest();
 			
-			String result = sReq.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None"));
+			String result = sReq.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, true, sPref.getString("token", "None"));
 			
 			return result;
 		}
@@ -436,6 +433,7 @@ public class ScheduleScreen extends Fragment {
 			
 			try {
 				json = new JSONArray(result);
+				
 				showSchedule();
 				Toast.makeText(getActivity(), week, Toast.LENGTH_SHORT).show();
 			} catch (JSONException e) {

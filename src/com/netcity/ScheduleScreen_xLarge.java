@@ -326,7 +326,7 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 			Log.w("MYLOG", "Started");
 			
 			try {				
-				jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", "true", sPref.getString("token", "None")));
+				jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", true, sPref.getString("token", "None")));
 				
 				Log.w("MYLOG", "Req successful");
 				
@@ -377,7 +377,7 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 				}
 				
 				
-				json = new JSONArray(sReqSchedule.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None")));
+				json = new JSONArray(sReqSchedule.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, true, sPref.getString("token", "None")));
 				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -413,8 +413,6 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			
-			
-			
 			llSchedule.removeAllViews();
 			
 			ProgressBar prbar = new ProgressBar(getActivity());
@@ -439,7 +437,7 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 			
 			String result = null;
 			
-			result = sReq.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, "true", sPref.getString("token", "None"));
+			result = sReq.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, true, sPref.getString("token", "None"));
 			
 			return result;
 		}

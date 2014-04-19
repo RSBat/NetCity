@@ -29,21 +29,30 @@ import android.util.Log;
  */
 public class ServerRequest {
 
-	/**
+	/*
 	 * @param 1 url по которому надо отправить запрос
 	 * @param 2 дополнительные аргументы
 	 * @param 3 надо ли отправлить ключ авторизации true/false
 	 * @param 4 ключ авторизации
 	 */
-	protected String connect(String... params) {
+	
+	/**
+	 * 
+	 * @param url URL на который надо отправить запрос
+	 * @param params Дополнительные параметры
+	 * @param tokenRequired Нужен ли ключ
+	 * @param token Ключ авторизации
+	 * @return Строка содержащая JSONArray
+	 */
+	protected String connect(String url, String params, boolean tokenRequired, String token) {
 		HttpClient client = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet(params[0] + params[1]);
+		HttpGet httpGet = new HttpGet(url + params);
 		HttpResponse response;
 		HttpEntity entity;
 		InputStream ins;
 		
-		if (params[2].equals("true")) {
-			httpGet.addHeader("Auth-Token", params[3]);
+		if (tokenRequired) {
+			httpGet.addHeader("Auth-Token", token);
 		}
 		
 		try {

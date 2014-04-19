@@ -1002,7 +1002,8 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f060023;
         public static final int action_bar_title=0x7f060022;
         public static final int action_context_bar=0x7f06001d;
-        public static final int action_logOut=0x7f060061;
+        public static final int action_enterToken=0x7f060061;
+        public static final int action_logOut=0x7f060062;
         public static final int action_menu_divider=0x7f060016;
         public static final int action_menu_presenter=0x7f060017;
         public static final int action_mode_close_button=0x7f060024;

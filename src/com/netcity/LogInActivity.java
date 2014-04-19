@@ -15,6 +15,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -57,24 +58,25 @@ public class LogInActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState); //Хз зачем но надо
 		setContentView(R.layout.activity_log_in_screen); //Выбираем layout файл для активити
 		
-		//Присваеваем переменным соответствующие view
-		etUserName = (EditText) findViewById(R.id.et_userName); //Поле ввода логина
-		etPassword = (EditText) findViewById(R.id.et_password); //Поле ввода пароля
-		btnLogIn = (Button) findViewById(R.id.btn_logIn); //Кнопка для отправки логина и пароля
-		
-		getServers(); //Вызов функции отвечающей за получение списка школ
-		
 		SharedPreferences sPref = getSharedPreferences("NetCity", MODE_PRIVATE);
+		
 		if (!sPref.getString("token", "None").equals("None")) {
 			Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
 			startActivity(intent); //Запуск станицы с расписанием
 			finish();
 		}
+		
+		getServers(); //Вызов функции отвечающей за получение списка школ
+		
+		//Присваеваем переменным соответствующие view
+		etUserName = (EditText) findViewById(R.id.et_userName); //Поле ввода логина
+		etPassword = (EditText) findViewById(R.id.et_password); //Поле ввода пароля
+		btnLogIn = (Button) findViewById(R.id.btn_logIn); //Кнопка для отправки логина и пароля
 	}
 
 	public void getServers() { //Функция для заполнения выпадающего списка
 		ConnectorServer connection = new ConnectorServer();
-		connection.execute("http://195.88.220.90/v1/login/srv_list");
+		connection.execute("http://195.88.220.90/v1/login/srv_list", "");
 		try {
 			String result = connection.get();
 			JSONObject json = new JSONObject(result);
@@ -127,8 +129,20 @@ public class LogInActivity extends ActionBarActivity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		getServers();
-		Toast.makeText(this, "Обновлено", Toast.LENGTH_SHORT).show();
+		switch (item.getItemId())
+		{
+		case R.id.action_refresh:
+			getServers();
+			Toast.makeText(this, "Обновлено", Toast.LENGTH_SHORT).show();
+			break;
+			
+		case R.id.action_enterToken:
+			SharedPreferences sPref = getSharedPreferences("NetCity", MODE_PRIVATE);
+			Editor prefEd = sPref.edit();
+			prefEd.putString("token", "c139897fcadcee085f8eceeec71229b4e9efd741");
+			prefEd.commit();
+			break;
+		}
 		return true;
 	}
 	
@@ -188,41 +202,22 @@ public class LogInActivity extends ActionBarActivity {
 		
 		@Override
 		protected String doInBackground(String... params) {
-			// TODO Auto-generated method stub
-			HttpClient client = new DefaultHttpClient(); //Создаем стандартный HTTP клиент
-			HttpGet httpGet = new HttpGet(params[0]); //Создаем Get-запрос на сервер
-			HttpResponse response; //Отвечает за ответ
-			HttpEntity entity; //Хз что это
-			InputStream ins; //Поток с пришедшими данными
+			ServerRequest sReqAuth = new ServerRequest();
 			
-			try {
-				response = client.execute(httpGet); //Получения ответа на Get-запрос
-				entity = response.getEntity(); //Хз что это
-				ins = entity.getContent(); //Получаем поток из пришедших данных
-				try {
-					String result = null; //Строка с результатом
-					BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "utf-8"), 256); //Буффер с данными из полученного потока
-					StringBuilder sb = new StringBuilder(); //Конструктор строк для получения готовой строки
-					String line = null; //Строка из буффера
-					
-					while ((line = reader.readLine()) != null)  sb.append(line); //Получаем данные из буфера и заносим их в конструктор строк
-			    	
-					result = sb.toString(); //Получаем готовую строку
-			    	ins.close(); //Закрываем поток с полученными данными
-			    	
-			    	return result;
-				} catch (Exception e) {}
-			} catch (ClientProtocolException e) { //TODO
-			} catch (IOException e) { //Ошибка когда нет соединения
-				return "";
-			}
-			return "";
+			return sReqAuth.connect(params[0], params[1], false, "");
 		}
 		
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			if (result == "") Toast.makeText(getApplication(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();//btnLogIn.setEnabled(false);
+			try {
+				if (new JSONArray(result).getJSONObject(0).optString("error", "None").equals("None")) {
+					Toast.makeText(getApplication(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();//btnLogIn.setEnabled(false);
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -256,50 +251,25 @@ public class LogInActivity extends ActionBarActivity {
 		        e.printStackTrace();
 		    }
 			
-			StringBuilder urlSb = new StringBuilder(100);
-			urlSb.append("http://195.88.220.90/v1/login/auth/?srv=");
-			urlSb.append(params[0]);
-			urlSb.append("&sid=");
-			urlSb.append(params[1]);
-			urlSb.append("&cn=");
-			urlSb.append(params[2]);
-			urlSb.append("&scid=");
-			urlSb.append(params[3]);
-			urlSb.append("&login=");
-			urlSb.append(params[4]);
-			urlSb.append("&password=");
-			urlSb.append(passwHash);
-			urlSb.append("&pwlen=");
-			urlSb.append(params[5].length());
+			StringBuilder sbParams = new StringBuilder(100);
+			sbParams.append("/?srv=");
+			sbParams.append(params[0]);
+			sbParams.append("&sid=");
+			sbParams.append(params[1]);
+			sbParams.append("&cn=");
+			sbParams.append(params[2]);
+			sbParams.append("&scid=");
+			sbParams.append(params[3]);
+			sbParams.append("&login=");
+			sbParams.append(params[4]);
+			sbParams.append("&password=");
+			sbParams.append(passwHash);
+			sbParams.append("&pwlen=");
+			sbParams.append(params[5].length());
 			
-			HttpClient client = new DefaultHttpClient(); //Создаем стандартный HTTP клиент
-			HttpGet httpGet = new HttpGet(urlSb.toString()); //Создаем Get-запрос на сервер
-			HttpResponse response; //Отвечает за ответ
-			HttpEntity entity; //Хз что это
-			InputStream ins; //Поток с пришедшими данными
+			ServerRequest sReqAuth = new ServerRequest();
 			
-			try {
-				response = client.execute(httpGet); //Получения ответа на Get-запрос
-				entity = response.getEntity(); //Хз что это
-				ins = entity.getContent(); //Получаем поток из пришедших данных
-				try {
-					String result = null; //Строка с результатом
-					BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "utf-8"), 256); //Буффер с данными из полученного потока
-					StringBuilder sb = new StringBuilder(); //Конструктор строк для получения готовой строки
-					String line = null; //Строка из буффера
-					
-					while ((line = reader.readLine()) != null)  sb.append(line); //Получаем данные из буфера и заносим их в конструктор строк
-			    	
-					result = sb.toString(); //Получаем готовую строку
-			    	ins.close(); //Закрываем поток с полученными данными
-			    	
-			    	return result;
-				} catch (Exception e) {}
-			} catch (ClientProtocolException e) { //TODO
-			} catch (IOException e) { //Ошибка когда нет соединения
-				return "";
-			}
-			return "";
+			return sReqAuth.connect("http://195.88.220.90/v1/login/auth", sbParams.toString(), false, "");
 		}
 	}
 }
