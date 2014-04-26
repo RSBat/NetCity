@@ -51,7 +51,8 @@ public class ScheduleScreen extends Fragment {
 	Button btnWeekNext, btnWeekPrev;
 	
 	int day = 0;
-	int weekNum = 0;
+	/** Реальный номер недели. Для номера в массиве weekNum - 1 */
+	int weekNum = 0; 
 	String week = "";
 	
 	/**
@@ -307,7 +308,8 @@ public class ScheduleScreen extends Fragment {
 	
 	class GetSchedule extends AsyncTask<Void,Void,String> {
 		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
-			
+		SharedPreferences sPrefSched = getActivity().getSharedPreferences("NetCitySchedule", getActivity().MODE_PRIVATE);
+		
 		ServerRequest sReqSchedule = new ServerRequest();
 		ServerRequest sReqWeeks = new ServerRequest();
 			
@@ -316,7 +318,12 @@ public class ScheduleScreen extends Fragment {
 			// TODO Auto-generated method stub
 			
 			try {				
-				jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", true, sPref.getString("token", "None")));
+				if (sPrefSched.getString("weeks", "None").equals("None")) {
+					jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", true, sPref.getString("token", "None")));
+				}
+				else {
+					jsonWeeks = new JSONArray(sPrefSched.getString("weeks", "[{\"error\":\"error\"}]"));
+				}
 				
 				for (int i = 0; i < jsonWeeks.length(); i++) {
 					if (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2 == -1) {
@@ -333,7 +340,6 @@ public class ScheduleScreen extends Fragment {
 						if (((String) (jsonWeeks.getJSONObject(i).keys().next())).equals(strTomorrow)) {
 							weekNum = i+1;
 							week = (String) jsonWeeks.getJSONObject(i).keys().next();
-							Log.w("MYLOG", week);
 						}
 					} else {
 						Calendar monday = Calendar.getInstance();
@@ -349,11 +355,6 @@ public class ScheduleScreen extends Fragment {
 							sbMonday.deleteCharAt(0);
 						}
 						strMonday = sbMonday.toString();
-						
-						Log.w("MYLOG", "----------");
-						Log.w("MYLOG", i + "");
-						Log.w("MYLOG", strMonday);
-						Log.w("MYLOG", (String) (jsonWeeks.getJSONObject(i).keys().next()));
 						
 						if (((String) (jsonWeeks.getJSONObject(i).keys().next())).equals(strMonday)) {
 							weekNum = i+1;
@@ -380,8 +381,23 @@ public class ScheduleScreen extends Fragment {
 			try {
 				if (json.getJSONObject(0).optString("error", "None").equals("None")) {
 					showSchedule();
+					
+					Editor ed = sPrefSched.edit();
+					ed.putString("week", week);
+					ed.putInt("weekNum", weekNum);
+					ed.putString("schedule", json.toString());
+					ed.putString("weeks", jsonWeeks.toString());
+					ed.commit();
 				} else {
 					Toast.makeText(getActivity(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();
+					week = sPrefSched.getString("week", "None");
+					weekNum = sPrefSched.getInt("weekNum", 0);
+					json = new JSONArray(sPrefSched.getString("schedule", "[{\"error\":\"error\"}]"));
+					jsonWeeks = new JSONArray(sPrefSched.getString("weeks", "[{\"error\":\"error\"}]"));
+					
+					Log.w("MYLOG", week + weekNum + json.toString());
+					
+					showSchedule();
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -393,10 +409,11 @@ public class ScheduleScreen extends Fragment {
 	
 	class ChangeWeek extends AsyncTask<Integer, Void, String> {
 
+		int weekNumPrev;
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			
+			weekNumPrev = weekNum;
 			llSchedule.removeAllViews();
 			
 			ProgressBar prbar = new ProgressBar(getActivity());
@@ -430,16 +447,27 @@ public class ScheduleScreen extends Fragment {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			
+			JSONArray jsonTemp;
 			try {
-				json = new JSONArray(result);
+				jsonTemp = new JSONArray(result);
 				
-				showSchedule();
-				Toast.makeText(getActivity(), week, Toast.LENGTH_SHORT).show();
+				if (jsonTemp.getJSONObject(0).optString("error", "None").equals("None")) {
+					json = new JSONArray(result);
+				
+					Toast.makeText(getActivity(), week, Toast.LENGTH_SHORT).show();
+				} else { //if (jsonTemp.getJSONObject(0).optString("error", "None").equals("IOException")) {
+					weekNum = weekNumPrev;
+					week = (String) jsonWeeks.getJSONObject(weekNum-1).keys().next();
+					Toast.makeText(getActivity(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();
+				}
+				
+				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			showSchedule();
 		}
 	}
 }

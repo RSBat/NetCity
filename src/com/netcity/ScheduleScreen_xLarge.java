@@ -24,6 +24,7 @@ import com.netcity.ScheduleScreen.ChangeWeek;
 import com.netcity.ScheduleScreen.GetSchedule;
 
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -313,6 +314,7 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 		ServerRequest sReqSchedule = new ServerRequest();
 		ServerRequest sReqWeeks = new ServerRequest();
 		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
+		SharedPreferences sPrefSched = getActivity().getSharedPreferences("NetCitySchedule", getActivity().MODE_PRIVATE);
 		
 		protected void onPreExecute() {
 			
@@ -325,8 +327,13 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 			
 			Log.w("MYLOG", "Started");
 			
-			try {				
-				jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", true, sPref.getString("token", "None")));
+			try {	
+				if (sPrefSched.getString("weeks", "None").equals("None")) {
+					jsonWeeks = new JSONArray(sReqWeeks.connect("http://195.88.220.90/v1/schedule/week_list", "", true, sPref.getString("token", "None")));
+				}
+				else {
+					jsonWeeks = new JSONArray(sPrefSched.getString("weeks", "[{\"error\":\"error\"}]"));
+				}
 				
 				Log.w("MYLOG", "Req successful");
 				
@@ -393,8 +400,23 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 			try {
 				if (json.getJSONObject(0).optString("error", "None").equals("None")) {
 					showSchedule();
+					
+					Editor ed = sPrefSched.edit();
+					ed.putString("week", week);
+					ed.putInt("weekNum", weekNum);
+					ed.putString("schedule", json.toString());
+					ed.putString("weeks", jsonWeeks.toString());
+					ed.commit();
 				} else {
 					Toast.makeText(getActivity(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();
+					week = sPrefSched.getString("week", "None");
+					weekNum = sPrefSched.getInt("weekNum", 0);
+					json = new JSONArray(sPrefSched.getString("schedule", "[{\"error\":\"error\"}]"));
+					jsonWeeks = new JSONArray(sPrefSched.getString("weeks", "[{\"error\":\"error\"}]"));
+					
+					Log.w("MYLOG", week + weekNum + json.toString());
+					
+					showSchedule();
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block

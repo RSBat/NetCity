@@ -60,6 +60,11 @@ public class LogInActivity extends ActionBarActivity {
 		
 		SharedPreferences sPref = getSharedPreferences("NetCity", MODE_PRIVATE);
 		
+		/*
+		 * Проверяем есть ли ключ
+		 * Есть - переходим на расписание
+		 * Нет - продолжаем
+		 */
 		if (!sPref.getString("token", "None").equals("None")) {
 			Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
 			startActivity(intent); //Запуск станицы с расписанием
@@ -74,6 +79,10 @@ public class LogInActivity extends ActionBarActivity {
 		btnLogIn = (Button) findViewById(R.id.btn_logIn); //Кнопка для отправки логина и пароля
 	}
 
+	/**
+	 * Метод заполняющий список школ (для Южно-Сахалинска)
+	 * TODO написать такиеже для остальных выборов
+	 */
 	public void getServers() { //Функция для заполнения выпадающего списка
 		ConnectorServer connection = new ConnectorServer();
 		connection.execute("http://195.88.220.90/v1/login/srv_list", "");
@@ -133,7 +142,6 @@ public class LogInActivity extends ActionBarActivity {
 		{
 		case R.id.action_refresh:
 			getServers();
-			Toast.makeText(this, "Обновлено", Toast.LENGTH_SHORT).show();
 			break;
 			
 		case R.id.action_enterToken:
@@ -146,14 +154,20 @@ public class LogInActivity extends ActionBarActivity {
 		return true;
 	}
 	
-	//Выход пользователя
-	public void logOut(View v) {
-		//TODO отправка данных на сервер для выхода из нетскула
-	}
-	
-	//Отправка логина и пароля и в случае удачи переход на расписание
+	/**
+	 * Метод отправляющий логин и парол на сервер и если все правильно то переходим на расписание 
+	 */
 	public void logIn(View v) {
-		//TODO отправка логина и пароля на сервер	
+		//TODO заменить автоматиченские данные в запросе на сервер
+		if (etUserName.getText().toString().equals("")) {
+			Toast.makeText(this, "Пожайлуста, введите логин", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		if (etPassword.getText().toString().equals("")) {
+			Toast.makeText(this, "Пожайлуста, введите пароль", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		
 		Auth connection = new Auth();
 		connection.execute(servers[serverSlct.getSelectedItemPosition()], "1", "1", "1", etUserName.getText().toString(), etPassword.getText().toString());
@@ -172,6 +186,10 @@ public class LogInActivity extends ActionBarActivity {
 				Intent intent = new Intent(this, ContentActivity.class); //Создаем ссылку на страницу с расписанием
 				startActivity(intent); //Запуск станицы с расписанием
 				finish();
+			} else if (status.equals("IOException")){
+				Toast.makeText(this, "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();
+			} else if (status.equals("wrong password")) {
+				Toast.makeText(this, "Неверный логин или пароль", Toast.LENGTH_LONG);
 			} else {
 				Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
 			}
@@ -210,9 +228,14 @@ public class LogInActivity extends ActionBarActivity {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
+			
 			try {
-				if (new JSONArray(result).getJSONObject(0).optString("error", "None").equals("None")) {
-					Toast.makeText(getApplication(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();//btnLogIn.setEnabled(false);
+				/*
+				 * Если соединение не было успешно то в поле error должно быть IOException
+				 */
+				if (new JSONArray(result).getJSONObject(0).optString("error", "None").equals("IOException")) {
+					Toast.makeText(getApplication(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();
+					btnLogIn.setEnabled(false);
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block

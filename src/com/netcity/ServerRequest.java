@@ -29,13 +29,6 @@ import android.util.Log;
  */
 public class ServerRequest {
 
-	/*
-	 * @param 1 url по которому надо отправить запрос
-	 * @param 2 дополнительные аргументы
-	 * @param 3 надо ли отправлить ключ авторизации true/false
-	 * @param 4 ключ авторизации
-	 */
-	
 	/**
 	 * 
 	 * @param url URL на который надо отправить запрос
@@ -43,6 +36,7 @@ public class ServerRequest {
 	 * @param tokenRequired Нужен ли ключ
 	 * @param token Ключ авторизации
 	 * @return Строка содержащая JSONArray
+	 * или [{"error":"IOException"}] - нет соединения
 	 */
 	protected String connect(String url, String params, boolean tokenRequired, String token) {
 		HttpClient client = new DefaultHttpClient();
@@ -59,27 +53,24 @@ public class ServerRequest {
 			response = client.execute(httpGet);
 			entity = response.getEntity();
 			ins = entity.getContent();
-			try {
-				String result;
-				BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "utf-8"), 256);
-				StringBuilder sb = new StringBuilder();
-				String line = null;
-				
-				while ((line = reader.readLine()) != null)  sb.append(line); 
-		    		result = sb.toString();
-		    	ins.close();
+			
+			String result;
+			BufferedReader reader = new BufferedReader(new InputStreamReader(ins, "utf-8"), 256);
+			StringBuilder sb = new StringBuilder();
+			String line = null;
+			
+			while ((line = reader.readLine()) != null)  sb.append(line); 
+	    		result = sb.toString();
+	    	ins.close();
 		    	
-		    	Log.w("MYLOG", result);
-		    	
-		    	return result;
-			} catch (Exception e) {
-				return "[{\"error\":\"error\"}]";
-			}
+	    	Log.w("MYLOG", result);
+	    	
+	    	return result;
+			
 		} catch (ClientProtocolException e) {
 			return "[{\"error\":\"ClientProtocolException\"}]";
 		} catch (IOException e) { //Ошибка когда нет соединения
 			return "[{\"error\":\"IOException\"}]";
 		}
-		//return "[{\"error\":\"error\"}]";
 	}
 }
