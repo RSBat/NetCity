@@ -67,9 +67,6 @@ public class ScheduleScreen extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.schedule_screen, null);
 		
-		GetSchedule getSchedule = new GetSchedule();
-		getSchedule.execute();
-		
 		llSchedule = (LinearLayout) v.findViewById(R.id.ll_schedule);
 		
 		tvDayOfWeek = (TextView) v.findViewById(R.id.tv_dayOfWeek);
@@ -84,6 +81,9 @@ public class ScheduleScreen extends Fragment {
 		
 		btnWeekNext = (Button) v.findViewById(R.id.btn_nextWeek);
 		btnWeekPrev = (Button) v.findViewById(R.id.btn_prevWeek);
+		
+		GetSchedule getSchedule = new GetSchedule();
+		getSchedule.execute();
 		
 		OnClickListener onCl = new OnClickListener() {
 
@@ -154,33 +154,6 @@ public class ScheduleScreen extends Fragment {
 		
 		if (day == -1) {
 			day = 0;
-		}
-		
-		switch (day)
-		{
-		case 0:
-			btnMonday.setEnabled(false);
-			break;
-			
-		case 1:
-			btnTuesday.setEnabled(false);
-			break;
-			
-		case 2:
-			btnWednesday.setEnabled(false);
-			break;
-			
-		case 3:
-			btnThursday.setEnabled(false);
-			break;
-			
-		case 4:
-			btnFriday.setEnabled(false);
-			break;
-			
-		case 5:
-			btnSaturday.setEnabled(false);
-			break;
 		}
 		
 		return v;
@@ -314,6 +287,16 @@ public class ScheduleScreen extends Fragment {
 		ServerRequest sReqWeeks = new ServerRequest();
 			
 		@Override
+		protected void onPreExecute() {
+			btnMonday.setEnabled(false);
+			btnTuesday.setEnabled(false);
+			btnWednesday.setEnabled(false);
+			btnThursday.setEnabled(false);
+			btnFriday.setEnabled(false);
+			btnSaturday.setEnabled(false);
+		}
+		
+		@Override
 		protected String doInBackground(Void... arg0) {
 			// TODO Auto-generated method stub
 			
@@ -395,9 +378,34 @@ public class ScheduleScreen extends Fragment {
 					json = new JSONArray(sPrefSched.getString("schedule", "[{\"error\":\"error\"}]"));
 					jsonWeeks = new JSONArray(sPrefSched.getString("weeks", "[{\"error\":\"error\"}]"));
 					
-					Log.w("MYLOG", week + weekNum + json.toString());
-					
 					showSchedule();
+				}
+				
+				switch (day)
+				{
+				case 0:
+					setBtnEnabled(btnMonday);
+					break;
+					
+				case 1:
+					setBtnEnabled(btnTuesday);
+					break;
+						
+				case 2:
+					setBtnEnabled(btnWednesday);
+					break;
+						
+				case 3:
+					setBtnEnabled(btnThursday);
+					break;
+						
+				case 4:
+					setBtnEnabled(btnFriday);
+					break;
+						
+				case 5:
+					setBtnEnabled(btnSaturday);
+					break;
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -419,6 +427,13 @@ public class ScheduleScreen extends Fragment {
 			ProgressBar prbar = new ProgressBar(getActivity());
 			
 			llSchedule.addView(prbar);
+			
+			btnMonday.setEnabled(false);
+			btnTuesday.setEnabled(false);
+			btnWednesday.setEnabled(false);
+			btnThursday.setEnabled(false);
+			btnFriday.setEnabled(false);
+			btnSaturday.setEnabled(false);
 		}
 		
 		@Override
@@ -453,15 +468,38 @@ public class ScheduleScreen extends Fragment {
 				
 				if (jsonTemp.getJSONObject(0).optString("error", "None").equals("None")) {
 					json = new JSONArray(result);
-				
-					Toast.makeText(getActivity(), week, Toast.LENGTH_SHORT).show();
 				} else { //if (jsonTemp.getJSONObject(0).optString("error", "None").equals("IOException")) {
 					weekNum = weekNumPrev;
 					week = (String) jsonWeeks.getJSONObject(weekNum-1).keys().next();
 					Toast.makeText(getActivity(), "Не удается установить соединение с сервером. Пожайлуста проверьте интернет-соединение", Toast.LENGTH_LONG).show();
 				}
 				
-				
+				switch (day)
+				{
+				case 0:
+					setBtnEnabled(btnMonday);
+					break;
+					
+				case 1:
+					setBtnEnabled(btnTuesday);
+					break;
+						
+				case 2:
+					setBtnEnabled(btnWednesday);
+					break;
+						
+				case 3:
+					setBtnEnabled(btnThursday);
+					break;
+						
+				case 4:
+					setBtnEnabled(btnFriday);
+					break;
+						
+				case 5:
+					setBtnEnabled(btnSaturday);
+					break;
+				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

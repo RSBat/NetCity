@@ -68,9 +68,6 @@ public class ScheduleScreen_xLarge extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.schedule_screen_xlarge, null);
 		
-		GetSchedule getSchedule = new GetSchedule();
-		getSchedule.execute();
-		
 		btnMondayTuesday = (Button) v.findViewById(R.id.btn_monday_tuesday);
 		btnWednesdayThursday = (Button) v.findViewById(R.id.btn_wednesday_thursday);
 		btnFridaySaturday = (Button) v.findViewById(R.id.btn_friday_saturday);
@@ -85,6 +82,9 @@ public class ScheduleScreen_xLarge extends Fragment {
 		
 		btnWeekNext = (Button) v.findViewById(R.id.btn_nextWeek);
 		btnWeekPrev = (Button) v.findViewById(R.id.btn_prevWeek);
+		
+		GetSchedule getSchedule = new GetSchedule();
+		getSchedule.execute();
 		
 		OnClickListener onCl = new OnClickListener() {
 
@@ -144,21 +144,6 @@ public class ScheduleScreen_xLarge extends Fragment {
 		}
 		else if (day % 2 == 1) {
 			day -= 1;
-		}
-		
-		switch (day)
-		{
-		case 0:
-			setBtnEnabled(btnMondayTuesday);
-			break;
-			
-		case 2:
-			setBtnEnabled(btnWednesdayThursday);
-			break;
-			
-		case 4:
-			setBtnEnabled(btnFridaySaturday);
-			break;
 		}
 		
 		return v;
@@ -307,6 +292,7 @@ public class ScheduleScreen_xLarge extends Fragment {
 		btnMondayTuesday.setEnabled(true);
 		btnWednesdayThursday.setEnabled(true);
 		btnFridaySaturday.setEnabled(true);
+		
 		btn.setEnabled(false);
 	}
 	
@@ -317,8 +303,9 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 		SharedPreferences sPrefSched = getActivity().getSharedPreferences("NetCitySchedule", getActivity().MODE_PRIVATE);
 		
 		protected void onPreExecute() {
-			
-			
+			btnMondayTuesday.setEnabled(false);
+			btnWednesdayThursday.setEnabled(false);
+			btnFridaySaturday.setEnabled(false);
 		}
 		
 		@Override
@@ -418,6 +405,21 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 					
 					showSchedule();
 				}
+				
+				switch (day)
+				{
+				case 0:
+					setBtnEnabled(btnMondayTuesday);
+					break;
+						
+				case 2:
+					setBtnEnabled(btnWednesdayThursday);
+					break;
+						
+				case 4:
+					setBtnEnabled(btnFridaySaturday);
+					break;
+				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -440,6 +442,10 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 			ProgressBar prbar = new ProgressBar(getActivity());
 			
 			llSchedule.addView(prbar);
+			
+			btnMondayTuesday.setEnabled(false);
+			btnWednesdayThursday.setEnabled(false);
+			btnFridaySaturday.setEnabled(false);
 		}
 		
 		@Override
@@ -472,6 +478,21 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 				json = new JSONArray(result);
 				showSchedule();
 				Toast.makeText(getActivity(), week, Toast.LENGTH_SHORT).show();
+				
+				switch (day)
+				{
+				case 0:
+					setBtnEnabled(btnMondayTuesday);
+					break;
+						
+				case 2:
+					setBtnEnabled(btnWednesdayThursday);
+					break;
+						
+				case 4:
+					setBtnEnabled(btnFridaySaturday);
+					break;
+				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
