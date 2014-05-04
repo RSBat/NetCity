@@ -14,6 +14,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -82,8 +83,7 @@ public class ScheduleScreen extends Fragment {
 		btnWeekNext = (Button) v.findViewById(R.id.btn_nextWeek);
 		btnWeekPrev = (Button) v.findViewById(R.id.btn_prevWeek);
 		
-		GetSchedule getSchedule = new GetSchedule();
-		getSchedule.execute();
+		
 		
 		OnClickListener onCl = new OnClickListener() {
 
@@ -159,11 +159,30 @@ public class ScheduleScreen extends Fragment {
 		return v;
 	}
 	
+	public void onStart() {
+		super.onStart();
+		
+		GetSchedule getSchedule = new GetSchedule();
+		getSchedule.execute();
+	}
+	
 	/**
 	 * <p><b>Функция показа расписания</b></p>
 	 * <p>Получает день недели из глобальной переменной (int) day и заполняет экран данными из глобального (JSONArray) json</p>
 	 */
 	public void showSchedule() {
+		
+		while (this.isAdded() == false) {
+			new Handler().postDelayed(new Runnable()
+			{
+			    @Override
+			    public void run()
+			    {
+			        //do your stuff here.
+			    }
+			}, 100);
+		}
+		
 		//TODO вывод расписания на экран
 		llSchedule.removeAllViews();
 		
@@ -342,13 +361,14 @@ public class ScheduleScreen extends Fragment {
 						if (((String) (jsonWeeks.getJSONObject(i).keys().next())).equals(strMonday)) {
 							weekNum = i+1;
 							week = (String) jsonWeeks.getJSONObject(i).keys().next();
-							Log.w("MYLOG", "week" + week);
 							break;
 						}
 					}
 				}
 				
-				json = new JSONArray(sReqSchedule.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, true, sPref.getString("token", "None")));
+				String sched = sReqSchedule.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, true, sPref.getString("token", "None"));
+				
+				json = new JSONArray(sched);
 				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -360,6 +380,10 @@ public class ScheduleScreen extends Fragment {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
+			
+			if (json == null) {
+				return;
+			}
 			
 			try {
 				if (json.getJSONObject(0).optString("error", "None").equals("None")) {
