@@ -171,18 +171,6 @@ public class ScheduleScreen extends Fragment {
 	 * <p>ѕолучает день недели из глобальной переменной (int) day и заполн€ет экран данными из глобального (JSONArray) json</p>
 	 */
 	public void showSchedule() {
-		
-		while (this.isAdded() == false) {
-			new Handler().postDelayed(new Runnable()
-			{
-			    @Override
-			    public void run()
-			    {
-			        //do your stuff here.
-			    }
-			}, 100);
-		}
-		
 		//TODO вывод расписани€ на экран
 		llSchedule.removeAllViews();
 		
@@ -330,14 +318,18 @@ public class ScheduleScreen extends Fragment {
 				for (int i = 0; i < jsonWeeks.length(); i++) {
 					if (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2 == -1) {
 						Calendar tomorrow = Calendar.getInstance();
-						tomorrow.add(Calendar.DAY_OF_WEEK, 1);
+						tomorrow.add(Calendar.DATE, 1);
 						
 						Date dateTomorrow = tomorrow.getTime();
 						
 						SimpleDateFormat  dateFormat = new SimpleDateFormat("dd.MM.yy");    
 						
 						String strTomorrow = dateFormat.format(dateTomorrow);
-						
+						StringBuilder sbTomorrow = new StringBuilder(strTomorrow);
+						if (sbTomorrow.charAt(0) == '0') {
+							sbTomorrow.deleteCharAt(0);
+						}
+						strTomorrow = sbTomorrow.toString();
 						
 						if (((String) (jsonWeeks.getJSONObject(i).keys().next())).equals(strTomorrow)) {
 							weekNum = i+1;

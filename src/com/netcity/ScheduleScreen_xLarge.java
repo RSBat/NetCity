@@ -83,9 +83,6 @@ public class ScheduleScreen_xLarge extends Fragment {
 		btnWeekNext = (Button) v.findViewById(R.id.btn_nextWeek);
 		btnWeekPrev = (Button) v.findViewById(R.id.btn_prevWeek);
 		
-		GetSchedule getSchedule = new GetSchedule();
-		getSchedule.execute();
-		
 		OnClickListener onCl = new OnClickListener() {
 
 			@Override
@@ -147,6 +144,13 @@ public class ScheduleScreen_xLarge extends Fragment {
 		}
 		
 		return v;
+	}
+	
+	public void onStart() {
+		super.onStart();
+		
+		GetSchedule getSchedule = new GetSchedule();
+		getSchedule.execute();
 	}
 
 	private void showSchedule() {

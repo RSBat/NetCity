@@ -153,10 +153,7 @@ public class ContentActivity extends ActionBarActivity {
 			//TODO
 			SharedPreferences sPrefSched = getSharedPreferences("NetCitySchedule", MODE_PRIVATE);
 			Editor schedEd = sPrefSched.edit();
-			schedEd.putString("weeks", "None");
-			schedEd.putString("week", "None");
-			schedEd.putInt("weekNum", 0);
-			schedEd.putString("schedule", "None");
+			schedEd.clear();
 			schedEd.commit();
 			
 			finish();
