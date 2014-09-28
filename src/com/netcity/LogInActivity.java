@@ -1,20 +1,10 @@
 package com.netcity;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,13 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class LogInActivity extends ActionBarActivity {
-
+public class LogInActivity extends ActionBarActivity{
+	
 	//Описание переменных
 	
 	//Поля ввода текста
@@ -51,6 +40,8 @@ public class LogInActivity extends ActionBarActivity {
 	String[] servers = {""};
 	
 	private static long back_pressed; //Для обработки двойного нажатия на кнопку назад
+	
+	
 	
 	//Вызывается при создании активити
 	@Override

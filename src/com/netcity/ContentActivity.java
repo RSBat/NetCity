@@ -1,18 +1,13 @@
 package com.netcity;
 
-
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 public class ContentActivity extends ActionBarActivity {
-
+	
 	private static long back_pressed;
 	
 	final static String[] mDrawerTitles = {"Расписание", "Объявления", "Оценки", "Сменить пользователя", "Выход"};
@@ -33,14 +28,14 @@ public class ContentActivity extends ActionBarActivity {
     ActionBarDrawerToggle mDrawerToggle;
     
     int screenSelected;
-
+    boolean isTablet = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_content_screen);
 
-		
+		isTablet = ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
 		
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -96,8 +91,7 @@ public class ContentActivity extends ActionBarActivity {
 		
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
 	          return true;
-		}
-		
+		}		
 		return true;
 	}
 	
@@ -129,7 +123,7 @@ public class ContentActivity extends ActionBarActivity {
 		switch (position) 
 		{
 		case 0:
-			if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4) {
+			if (isTablet) {
 				fragment = Fragment.instantiate(this, ScheduleScreen_xLarge.class.getName());
 			} else {
 				fragment = Fragment.instantiate(this, ScheduleScreen.class.getName());
@@ -186,5 +180,4 @@ public class ContentActivity extends ActionBarActivity {
 	        selectItem(position);
 	    }
 	}
-
 }

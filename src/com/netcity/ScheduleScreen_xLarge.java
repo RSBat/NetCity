@@ -1,28 +1,14 @@
 package com.netcity;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.netcity.ScheduleScreen.ChangeWeek;
-import com.netcity.ScheduleScreen.GetSchedule;
-
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
@@ -47,7 +33,7 @@ import android.widget.LinearLayout.LayoutParams;
  *
  */
 public class ScheduleScreen_xLarge extends Fragment {
-
+	
 	LinearLayout llSchedule;
 	
 	TextView tvDayOfWeek1, tvDayOfWeek2;
@@ -303,8 +289,8 @@ public class ScheduleScreen_xLarge extends Fragment {
 class GetSchedule extends AsyncTask<Void,Void,String> {
 		ServerRequest sReqSchedule = new ServerRequest();
 		ServerRequest sReqWeeks = new ServerRequest();
-		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
-		SharedPreferences sPrefSched = getActivity().getSharedPreferences("NetCitySchedule", getActivity().MODE_PRIVATE);
+		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", Context.MODE_PRIVATE);
+		SharedPreferences sPrefSched = getActivity().getSharedPreferences("NetCitySchedule", Context.MODE_PRIVATE);
 		
 		protected void onPreExecute() {
 			btnMondayTuesday.setEnabled(false);
@@ -432,9 +418,9 @@ class GetSchedule extends AsyncTask<Void,Void,String> {
 		}
 	}
 	
-	class ChangeWeek extends AsyncTask<Integer, Void, String> {
+class ChangeWeek extends AsyncTask<Integer, Void, String> {
 
-		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
+		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", Context.MODE_PRIVATE);
 		ServerRequest sReq = new ServerRequest();
 		
 		@Override

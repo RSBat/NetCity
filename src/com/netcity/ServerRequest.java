@@ -12,19 +12,11 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 /**
  * Класс посылающий запрос на сервер и возвращающий ответ в виде строки содержащей JSON
- * 
- * @param 1 url по которому надо отправить запрос
- * @param 2 дополнительные аргументы
- * @param 3 надо ли отправлить ключ авторизации true/false
- * @param 4 ключ авторизации
- * 
- * @returns 1 строка содержащая JSON
- * 
+ *  * 
  * @author Сергей
  */
 public class ServerRequest {

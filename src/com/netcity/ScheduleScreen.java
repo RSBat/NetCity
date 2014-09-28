@@ -4,19 +4,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -170,7 +168,7 @@ public class ScheduleScreen extends Fragment {
 	 * <p><b>Функция показа расписания</b></p>
 	 * <p>Получает день недели из глобальной переменной (int) day и заполняет экран данными из глобального (JSONArray) json</p>
 	 */
-	public void showSchedule() {
+	private void showSchedule() {
 		//TODO вывод расписания на экран
 		llSchedule.removeAllViews();
 		
@@ -275,7 +273,7 @@ public class ScheduleScreen extends Fragment {
 	 * <p>Выключает нужную кнопку выбора дня при этом включая все остальные</p>
 	 * @param btn Кнопка которую надо выключить
 	 */
-	public void setBtnEnabled(Button btn) {
+	private void setBtnEnabled(Button btn) {
 		btnMonday.setEnabled(true);
 		btnTuesday.setEnabled(true);
 		btnWednesday.setEnabled(true);
@@ -285,10 +283,11 @@ public class ScheduleScreen extends Fragment {
 		
 		btn.setEnabled(false);
 	}
+
 	
 	class GetSchedule extends AsyncTask<Void,Void,String> {
-		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
-		SharedPreferences sPrefSched = getActivity().getSharedPreferences("NetCitySchedule", getActivity().MODE_PRIVATE);
+		SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", Context.MODE_PRIVATE);
+		SharedPreferences sPrefSched = getActivity().getSharedPreferences("NetCitySchedule", Context.MODE_PRIVATE);
 		
 		ServerRequest sReqSchedule = new ServerRequest();
 		ServerRequest sReqWeeks = new ServerRequest();
@@ -467,7 +466,8 @@ public class ScheduleScreen extends Fragment {
 				e.printStackTrace();
 			}
 			
-			SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", getActivity().MODE_PRIVATE);
+			getActivity();
+			SharedPreferences sPref = getActivity().getSharedPreferences("NetCity", Context.MODE_PRIVATE);
 			ServerRequest sReq = new ServerRequest();
 			
 			String result = sReq.connect("http://195.88.220.90/v1/schedule/week", "/?date=" + week, true, sPref.getString("token", "None"));
@@ -524,6 +524,8 @@ public class ScheduleScreen extends Fragment {
 			showSchedule();
 		}
 	}
+
+	
 }
 
 

@@ -1,7 +1,5 @@
 # cache for current jar dependency. DO NOT EDIT.
 # format is <lastModified> <length> <SHA-1> <path>
 # Encoding is UTF-8
-1394282815457 343731 d2fe9245d9ae17c490dbb97017f435a424fe6d38 D:\adt-bundle-windows-x86_64-20131030\sdk\extras\android\support\v7\appcompat\libs\android-support-v7-appcompat.jar
 1394282815457 343731 d2fe9245d9ae17c490dbb97017f435a424fe6d38 D:\Android_Workspace\NetCity v2\libs\android-support-v7-appcompat.jar
-1394282811984 627582 db0f122c99ef9f90dbab3fada6d191f2880cbb8e D:\adt-bundle-windows-x86_64-20131030\sdk\extras\android\support\v7\appcompat\libs\android-support-v4.jar
-1394282811984 627582 db0f122c99ef9f90dbab3fada6d191f2880cbb8e D:\Android_Workspace\NetCity v2\libs\android-support-v4.jar
+1403504240000 351603 aaa3ec7d7bfb3446a9190c5b1f601f1eb94745e7 D:\adt-bundle-windows-x86_64-20140702\sdk\extras\android\support\v7\appcompat\libs\android-support-v7-appcompat.jar
